@@ -189,3 +189,96 @@ User Request → spec-workflow → orchestrate-with-agents tool
 - Original spec-workflow-mcp: https://github.com/Pimzino/spec-workflow-mcp
 - Claude Code documentation: https://docs.anthropic.com/en/docs/claude-code
 - MCP Protocol: Model Context Protocol specification
+
+## Implementation Session Summary (2024-08-20)
+
+### Context
+This implementation was completed in response to the user's request to enhance spec-workflow-mcp with subagent orchestration support. The user specifically wanted to avoid hardcoding agent names and instead use LLM-based matching to dynamically discover and orchestrate available Claude Code subagents (like technical-product-manager, frontend-engineer, qa-engineer, backend-engineer, etc.).
+
+### What Was Accomplished
+
+#### 1. Repository Setup
+- ✅ Forked spec-workflow-mcp to `/Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp`
+- ✅ Created feature branch: `feature/llm-agent-orchestration`
+- ✅ Set up project structure with `.claude/` directories for agents and plans
+
+#### 2. Agent Definitions Created
+- ✅ **agent-orchestrator.md**: Main orchestrator that discovers agents, analyzes capabilities, delegates work, and aggregates results
+- ✅ **agent-capability-analyst.md**: Specialist that analyzes agent descriptions and provides matching scores
+
+#### 3. Core Implementation
+- ✅ **orchestrate-with-agents.ts**: New MCP tool that bridges spec-workflow with the orchestrator
+  - Accepts task, phase, context, strategy, and preferences
+  - Builds orchestrator prompts dynamically
+  - Returns structured orchestration results
+  
+- ✅ **Updated spec-workflow-guide.ts**: Added orchestration awareness to all phases
+  - Requirements Phase: Step 3 added for agent orchestration
+  - Design Phase: Step 6 added for parallel specialist work
+  - Task Planning Phase: Step 2 added for task breakdown delegation
+  - All numbering updated accordingly
+
+- ✅ **Updated src/tools/index.ts**: Registered new orchestrate-with-agents tool
+
+#### 4. Configuration
+- ✅ **orchestration.yaml**: Created comprehensive configuration template
+  - Supports enable/disable, mode selection (auto/manual/off)
+  - Capability-based preferences (no hardcoded names)
+  - Configurable thresholds, timeouts, and limits
+  - Fallback strategies and logging options
+
+#### 5. Documentation
+- ✅ **docs/ORCHESTRATION.md**: Complete documentation including:
+  - Architecture overview with Mermaid diagram
+  - Installation instructions
+  - Usage examples
+  - Configuration guide
+  - Troubleshooting section
+  - Future enhancement plans
+
+- ✅ **Updated .gitignore**: Modified to track .claude directory (was previously ignored)
+
+#### 6. Git Commits
+- ✅ Two commits on feature branch:
+  1. "feat: Add LLM-based agent orchestration support" - Core implementation
+  2. "feat: Add agent definitions and orchestration plan" - Agents and documentation
+
+### Key Design Achievements
+- **Zero hardcoded agent names**: Everything uses capability-based matching
+- **LLM-powered orchestration**: Natural language understanding for agent selection
+- **Graceful degradation**: Falls back to standard workflow when no agents available
+- **Transparent reasoning**: Orchestrator explains why agents were selected
+- **Minimal code complexity**: Most logic in prompts, not code
+
+### Current State
+The implementation is complete and ready for testing. The system can:
+1. Dynamically discover available Claude Code subagents
+2. Analyze their capabilities using the agent-capability-analyst
+3. Match tasks to agents based on semantic understanding
+4. Delegate work with focused prompts
+5. Aggregate results from multiple agents
+6. Fall back gracefully when no suitable agents exist
+
+### Next Steps for New Claude Instance
+1. **Build and Test**: Run `npm install && npm run build` in the project directory
+2. **Install Agents**: Copy `.claude/agents/*.md` to your Claude Code agents directory
+3. **Configure MCP**: Update your MCP configuration to use this forked version
+4. **Test Orchestration**: Try creating a spec with various subagents available
+5. **Iterate**: Based on testing, refine agent prompts and matching thresholds
+6. **Consider PR**: Once tested, consider submitting PR back to upstream repository
+
+### Important Files Modified/Created
+- `/src/tools/orchestrate-with-agents.ts` (new)
+- `/src/tools/spec-workflow-guide.ts` (modified - 3 orchestration sections added)
+- `/src/tools/index.ts` (modified - registered new tool)
+- `/.claude/agents/agent-orchestrator.md` (new)
+- `/.claude/agents/agent-capability-analyst.md` (new)
+- `/.spec-workflow/orchestration.yaml` (new)
+- `/docs/ORCHESTRATION.md` (new)
+- `/.gitignore` (modified - removed .claude from ignore list)
+
+### Session Notes
+- User emphasized avoiding hardcoded agent names multiple times
+- User preferred LLM-based matching over algorithmic scoring
+- User wanted agents to be project assets (tracked in git) rather than external
+- Implementation focused on flexibility and future-proofing over performance optimization
