@@ -22,6 +22,7 @@ export type Approval = {
 
 export type ProjectInfo = {
   projectName: string;
+  projectPath?: string;
   steering?: any;
   version?: string;
 };

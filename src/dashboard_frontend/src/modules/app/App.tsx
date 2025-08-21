@@ -40,6 +40,14 @@ function Header() {
                   v{info.version}
                 </span>
               )}
+              {info?.projectPath && (
+                <span
+                  className="hidden lg:inline text-xs px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full max-w-[32rem] truncate"
+                  title={`Specs path: ${info.projectPath}/.spec-workflow`}
+                >
+                  from {info.projectPath}/.spec-workflow
+                </span>
+              )}
             </div>
             
             {/* Desktop Navigation */}

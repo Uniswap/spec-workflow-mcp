@@ -4,6 +4,9 @@ import { dirname, resolve } from 'path';
 import react from '@vitejs/plugin-react';
 import { DashboardServer } from '../dashboard/server';
 
+// Determine project path to serve/watch (.spec-workflow lives here)
+const PROJECT_PATH = process.env.PROJECT_PATH || process.cwd();
+
 // Fixed backend port for Vite dev
 const BACKEND_PORT = 5174;
 
@@ -15,7 +18,7 @@ function dashboardBackendDev() {
     async configureServer() {
       if (started) return;
       started = true;
-      const projectPath = process.cwd();
+      const projectPath = PROJECT_PATH;
       const server = new DashboardServer({ projectPath, autoOpen: false, port: BACKEND_PORT });
       try {
         await server.start();
@@ -34,7 +37,7 @@ function specWorkflowWatcher() {
   return {
     name: 'spec-workflow-watcher',
     configureServer(server: any) {
-      const workflowRoot = resolve(process.cwd(), '.spec-workflow');
+      const workflowRoot = resolve(PROJECT_PATH, '.spec-workflow');
       server.watcher.add(workflowRoot);
       server.watcher.on('change', (file: string) => {
         if (file.startsWith(workflowRoot)) {

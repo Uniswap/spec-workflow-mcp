@@ -228,6 +228,7 @@ export class DashboardServer {
       
       return {
         projectName,
+        projectPath: this.options.projectPath,
         steering: steeringStatus,
         dashboardUrl: `http://localhost:${this.actualPort}`,
         version: this.packageVersion
