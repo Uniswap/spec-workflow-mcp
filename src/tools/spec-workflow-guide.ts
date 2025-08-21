@@ -100,7 +100,13 @@ Follow this exact sequence using the MCP tools:
 
 ### Initial Setup
 
-1. **Load Required Context Using MCP Tools**
+1. **Check Agent Orchestration Configuration (MANDATORY FIRST STEP)**
+   - Check if .spec-workflow/orchestration.yaml exists and has orchestration.enabled: true
+   - If enabled, you MUST use agent orchestration throughout ALL phases
+   - **CRITICAL**: Having "sufficient context" is NOT a reason to skip orchestration
+   - Agent orchestration provides diverse perspectives and specialized expertise that enhance quality
+
+2. **Load Required Context Using MCP Tools**
    - Call the get-template-context TOOL with category "spec" to load specification templates
    - Call the get-steering-context TOOL to check for steering documents
    - **If no steering documents exist**: Ask the user:
@@ -111,22 +117,26 @@ Follow this exact sequence using the MCP tools:
 
    **Store this context** - you will reference it throughout all phases without reloading.
 
-2. **Analyze Existing Codebase** (BEFORE starting any phase)
+3. **Analyze Existing Codebase** (BEFORE starting any phase)
    - Search for similar features: Look for existing patterns relevant to the new feature
    - Identify reusable components: Find utilities, services, hooks, or modules that can be leveraged
    - Review architecture patterns: Understand current project structure, naming conventions, and design patterns
    - Find integration points: Locate where new feature will connect with existing systems
    - Document findings: Note what can be reused vs. what needs to be built from scratch
 
-3. **Agent Orchestration for Codebase Analysis (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - The orchestrator can parallelize codebase analysis across multiple specialized agents
-   - Code archaeologists can identify patterns and conventions
-   - Architecture analysts can map system boundaries and integration points
-   - Component specialists can catalog reusable utilities and modules
-   - Results are aggregated into a comprehensive codebase understanding
+4. **Agent Orchestration for Codebase Analysis (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: If orchestration is enabled in .spec-workflow/orchestration.yaml, you MUST use this tool.
+   Do NOT skip orchestration even if you believe you have "sufficient context".
    
-   Example orchestration call:
+   The orchestrator provides:
+   - Parallel analysis across multiple specialized agents
+   - Diverse perspectives that you might miss
+   - Code archaeologists to identify patterns and conventions
+   - Architecture analysts to map system boundaries and integration points
+   - Component specialists to catalog reusable utilities and modules
+   - Aggregated results for comprehensive codebase understanding
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Analyze existing codebase for [feature] implementation",
@@ -134,6 +144,14 @@ Follow this exact sequence using the MCP tools:
      context: { projectStructure, featureDescription, steeringDocs }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for codebase analysis."
+   - Ask the user: "Would you like to create a custom agent for this task? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
+   - Document that standard workflow was used due to lack of specialized agents
+   
+   **Remember**: Having context is NOT a valid reason to skip orchestration when it's enabled.
 
 ## PHASE 1: Requirements Gathering
 
@@ -159,15 +177,18 @@ First, generate an initial set of requirements in EARS format based on the featu
    - "[platform] [feature] technical limitations"
    - "[industry] compliance requirements [feature-type]"
 
-3. **Agent Orchestration for Market Research (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - Market research agents can parallelize competitive analysis
-   - UX research specialists can identify user experience patterns
-   - Compliance experts can review regulatory requirements
-   - Industry analysts can benchmark against best practices
+3. **Agent Orchestration for Market Research (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: If orchestration is enabled, you MUST use agent orchestration here.
+   Do NOT skip this step because you think the requirements are "clear" or "straightforward".
+   
+   Agent orchestration ensures:
+   - Market research agents parallelize competitive analysis
+   - UX research specialists identify user experience patterns
+   - Compliance experts review regulatory requirements
+   - Industry analysts benchmark against best practices
    - All findings are synthesized into comprehensive market insights
    
-   Example orchestration call:
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Research market standards and user expectations for [feature]",
@@ -175,16 +196,26 @@ First, generate an initial set of requirements in EARS format based on the featu
      context: { featureDescription, industry, targetAudience }
    )
    \`\`\`
-
-4. **Agent Orchestration for Requirements Generation (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - Check for available specialized agents using the orchestrate-with-agents TOOL
-   - The orchestrator will intelligently delegate requirements generation to appropriate agents
-   - Example: Product managers, business analysts, or requirements specialists
-   - The orchestrator will aggregate results from multiple agents if beneficial
-   - If no suitable agents are found, proceed with standard workflow
    
-   Example orchestration call:
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for market research (e.g., UX researchers, industry analysts)."
+   - Ask the user: "Would you like to create a custom agent for market research? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
+   
+   **Remember**: Even "simple" features benefit from diverse specialist perspectives.
+
+4. **Agent Orchestration for Requirements Generation (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: If orchestration is enabled, you MUST use agent orchestration.
+   Never skip orchestration because you have "sufficient context" or the request seems "straightforward".
+   
+   Orchestration is mandatory because:
+   - Specialized agents provide expertise you might not have
+   - Multiple perspectives prevent blind spots
+   - Product managers bring user-centric thinking
+   - Business analysts ensure completeness
+   - Requirements specialists apply best practices
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Generate requirements for [feature]",
@@ -192,6 +223,14 @@ First, generate an initial set of requirements in EARS format based on the featu
      context: { steeringDocs, userDescription, marketResearch }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for requirements generation (e.g., product managers, business analysts)."
+   - Ask the user: "Would you like to create a custom agent for requirements generation? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
+   - Document that standard workflow was used due to lack of specialized agents
+   
+   **Important**: The orchestrator falling back to standard workflow is acceptable, but you MUST attempt orchestration first when enabled.
 
 5. **Generate requirements content**
    - Generate an initial version based on the user's rough idea WITHOUT asking sequential questions first
@@ -257,15 +296,17 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "[framework] performance benchmarks 2025"
    - "[library] vs [alternative] comparison 2025"
 
-3. **Agent Orchestration for Technology Research (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - Security experts can audit dependencies for vulnerabilities
-   - Performance engineers can benchmark technology choices
-   - Architecture specialists can evaluate design patterns
-   - DevOps engineers can assess deployment implications
-   - Results are combined into technology recommendations
+3. **Agent Orchestration for Technology Research (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Always use orchestration when enabled, regardless of your confidence level.
    
-   Example orchestration call:
+   Mandatory orchestration provides:
+   - Security experts to audit dependencies for vulnerabilities
+   - Performance engineers to benchmark technology choices
+   - Architecture specialists to evaluate design patterns
+   - DevOps engineers to assess deployment implications
+   - Combined results for comprehensive technology recommendations
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Research technology stack and dependencies for [feature]",
@@ -273,6 +314,13 @@ After the user approves the Requirements, develop a comprehensive design documen
      context: { requirements, techStack, proposedPackages }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for technology research (e.g., security experts, performance engineers)."
+   - Ask the user: "Would you like to create a custom agent for technology research? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
+   
+   **Note**: Your existing knowledge does NOT replace the need for specialist input.
 
 4. **Codebase Research** (MANDATORY)
    - Map existing patterns: Identify data models, API patterns, component structures
@@ -280,15 +328,18 @@ After the user approves the Requirements, develop a comprehensive design documen
    - Document architectural decisions: Note existing tech stack, state management, routing patterns
    - Identify integration points: Map how new feature connects to existing auth, database, APIs
 
-5. **Agent Orchestration for Codebase Analysis (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - Frontend specialists can analyze UI components and patterns
-   - Backend engineers can map API and data layer structures
-   - Infrastructure experts can identify deployment patterns
-   - Integration specialists can trace system boundaries
+5. **Agent Orchestration for Codebase Analysis (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Use orchestration even if you've already analyzed the codebase.
+   Multiple specialist perspectives always add value.
+   
+   Orchestration ensures:
+   - Frontend specialists analyze UI components and patterns
+   - Backend engineers map API and data layer structures
+   - Infrastructure experts identify deployment patterns
+   - Integration specialists trace system boundaries
    - Findings are merged into a comprehensive codebase map
    
-   Example orchestration call:
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Deep analysis of existing codebase for [feature] integration",
@@ -296,6 +347,11 @@ After the user approves the Requirements, develop a comprehensive design documen
      context: { requirements, projectStructure, existingPatterns }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for codebase analysis (e.g., frontend specialists, backend engineers)."
+   - Ask the user: "Would you like to create a custom agent for deep codebase analysis? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
 
 6. **Package Version Research** (MANDATORY - Use Web Search When Available)
    For any new dependencies you're considering:
@@ -311,15 +367,17 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "[package-name] vs [alternative] performance bundle size"
    - "[package-name] maintenance status github activity"
 
-7. **Agent Orchestration for Package Analysis (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - Security analysts can audit packages for known vulnerabilities
-   - Performance engineers can analyze bundle sizes and runtime impact
-   - Maintenance reviewers can assess package health and community support
-   - Compatibility experts can verify version matrix requirements
-   - All assessments are consolidated into package recommendations
+7. **Agent Orchestration for Package Analysis (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Always use orchestration for package analysis when enabled.
    
-   Example orchestration call:
+   Specialist agents provide:
+   - Security analysts to audit packages for known vulnerabilities
+   - Performance engineers to analyze bundle sizes and runtime impact
+   - Maintenance reviewers to assess package health and community support
+   - Compatibility experts to verify version matrix requirements
+   - Consolidated assessments for package recommendations
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Analyze and validate package dependencies for [feature]",
@@ -327,6 +385,11 @@ After the user approves the Requirements, develop a comprehensive design documen
      context: { proposedPackages, existingDependencies, securityRequirements }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for package analysis (e.g., security analysts, dependency experts)."
+   - Ask the user: "Would you like to create a custom agent for package analysis? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
 
 8. **Design Pattern Research** (MANDATORY - Use Web Search When Available)
    Research modern architectural patterns and design approaches:
@@ -345,15 +408,17 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "web performance optimization techniques 2025"
    - "accessibility patterns [framework] WCAG 2025"
 
-9. **Agent Orchestration for Design Pattern Research (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - Architecture experts can recommend appropriate patterns
-   - Performance specialists can suggest optimization strategies
-   - Accessibility engineers can ensure inclusive design patterns
-   - Testing specialists can propose verification approaches
-   - All recommendations are integrated into design guidelines
+9. **Agent Orchestration for Design Pattern Research (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Use orchestration regardless of your design expertise.
    
-   Example orchestration call:
+   Orchestration provides:
+   - Architecture experts to recommend appropriate patterns
+   - Performance specialists to suggest optimization strategies
+   - Accessibility engineers to ensure inclusive design patterns
+   - Testing specialists to propose verification approaches
+   - Integrated recommendations for comprehensive design guidelines
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Research and recommend design patterns for [feature]",
@@ -361,15 +426,23 @@ After the user approves the Requirements, develop a comprehensive design documen
      context: { requirements, techStack, architectureGoals }
    )
    \`\`\`
-
-10. **Agent Orchestration for Comprehensive Design (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - The orchestrator may parallelize design work to multiple specialists
-   - Example: Backend architects, frontend developers, database designers, security experts
-   - Each agent focuses on their area of expertise
-   - Results are aggregated into a comprehensive design
    
-   Example orchestration call:
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for design pattern research (e.g., architecture experts, accessibility engineers)."
+   - Ask the user: "Would you like to create a custom agent for design patterns? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
+
+10. **Agent Orchestration for Comprehensive Design (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Always use orchestration for design creation when enabled.
+   Do NOT skip because the design seems "straightforward" or you feel confident.
+   
+   Orchestration ensures:
+   - Parallel design work by multiple specialists
+   - Backend architects, frontend developers, database designers, security experts
+   - Each agent focuses on their area of expertise
+   - Results aggregated into a comprehensive design
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Create technical design based on requirements",
@@ -377,6 +450,11 @@ After the user approves the Requirements, develop a comprehensive design documen
      context: { requirements, steeringDocs, codebaseAnalysis, researchFindings }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for comprehensive design (e.g., backend architects, database designers, security experts)."
+   - Ask the user: "Would you like to create custom agents for design work? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
 
 11. **Generate design content**
    - Use the design template structure from initial get-template-context TOOL output
@@ -432,13 +510,16 @@ After the user approves the Design, create an actionable implementation plan wit
    - If you JUST created the requirements.md and design.md in this conversation, you already have the context
    - Only call get-spec-context TOOL if you're starting fresh on an existing spec or returning to work after a break
 
-2. **Agent Orchestration (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - The orchestrator can delegate task planning to project management specialists
-   - Task breakdown may be enhanced with agent recommendations
-   - Each task can be annotated with suggested agent assignments
+2. **Agent Orchestration (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Use orchestration for task planning when enabled.
+   Even if tasks seem obvious, specialist input improves task breakdown.
    
-   Example orchestration call:
+   Orchestration provides:
+   - Project management specialists for optimal task planning
+   - Enhanced task breakdown with agent recommendations
+   - Task annotations with suggested agent assignments
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Create implementation task list from design",
@@ -446,6 +527,11 @@ After the user approves the Design, create an actionable implementation plan wit
      context: { requirements, design, codebaseAnalysis }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for task planning (e.g., project managers, agile coaches)."
+   - Ask the user: "Would you like to create a custom agent for task planning? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
 
 3. **Generate Implementation Task List**
    Convert the feature design into a series of prompts for a code-generation LLM that will implement each step in a test-driven manner. Focus ONLY on tasks that involve writing, modifying, or testing code.
@@ -621,16 +707,19 @@ After completing all phases with user approval, the implementation phase can be 
    - Use the spec-status TOOL to see overall progress
    - Use the manage-tasks TOOL with action: "list" to see all tasks and their current status
 
-2. **Agent Orchestration for Implementation (When Available)**
-   If the orchestrate-with-agents TOOL is available:
-   - The orchestrator can assign tasks to specialized implementation agents
-   - Frontend tasks go to UI/React specialists
-   - Backend tasks go to API/database experts
-   - Testing tasks go to QA engineers
-   - Infrastructure tasks go to DevOps specialists
-   - Multiple independent tasks can be executed in parallel
+2. **Agent Orchestration for Implementation (MANDATORY if orchestration.enabled: true)**
+   **CRITICAL**: Always use orchestration for task execution when enabled.
+   Do NOT skip orchestration because you can implement the task yourself.
    
-   Example orchestration call:
+   Orchestration benefits:
+   - Specialized implementation agents for each task type
+   - Frontend tasks delegated to UI/React specialists
+   - Backend tasks handled by API/database experts
+   - Testing tasks executed by QA engineers
+   - Infrastructure tasks managed by DevOps specialists
+   - Parallel execution of independent tasks
+   
+   **MANDATORY orchestration call when enabled:**
    \`\`\`
    orchestrate-with-agents(
      task: "Execute implementation task: [task-description]",
@@ -638,6 +727,11 @@ After completing all phases with user approval, the implementation phase can be 
      context: { taskDetails, requirements, design, existingCode }
    )
    \`\`\`
+   
+   **Fallback Handling**:
+   - If no suitable agents are found, inform the user: "No specialized agents were found for implementation (e.g., frontend specialists, backend experts, QA engineers)."
+   - Ask the user: "Would you like to create custom agents for implementation tasks? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+   - If user declines or wants to proceed: Continue with standard workflow
 
 3. **Begin Task Execution**
    - Inform the user: "Starting implementation of [spec-name]. I'll work through each task systematically."
@@ -664,15 +758,18 @@ When users request task execution:
 - Executing tasks without the requirements or design will lead to inaccurate implementations
 - Use get-spec-context TOOL if needed to load all spec documents
 
-### Agent Orchestration for Task Execution (When Available)
-If the orchestrate-with-agents TOOL is available:
-- Analyze task complexity and requirements
-- Select agents with matching expertise for the specific task
-- For complex tasks, multiple agents can collaborate
-- Testing agents can verify implementation alongside development
-- The orchestrator ensures task requirements are fully met
+### Agent Orchestration for Task Execution (MANDATORY if orchestration.enabled: true)
+**CRITICAL**: When orchestration is enabled, ALWAYS use it for every task execution.
+Do NOT skip orchestration because you think you can handle the task yourself.
 
-Example orchestration call:
+Orchestration is mandatory because:
+- Specialists have deeper expertise in their domains
+- Multiple agents can collaborate on complex tasks
+- Testing agents verify implementation alongside development
+- The orchestrator ensures all requirements are fully met
+- Diverse perspectives catch edge cases you might miss
+
+**MANDATORY orchestration call when enabled:**
 \`\`\`
 orchestrate-with-agents(
   task: "Implement [specific-task-from-list]",
@@ -683,6 +780,14 @@ orchestrate-with-agents(
   }
 )
 \`\`\`
+
+**Fallback Handling**:
+- If no suitable agents are found, inform the user: "No specialized agents were found for this specific task type."
+- Ask the user: "Would you like to create a custom agent for this task? You can create specialized agents following the guide at https://docs.anthropic.com/en/docs/claude-code/sub-agents"
+- Suggest relevant agent types based on the task (e.g., "For this UI task, a React specialist agent would be helpful")
+- If user declines or wants to proceed: Continue with standard workflow
+
+**Remember**: Having the skills to implement something doesn't mean you should skip specialist input when orchestration is enabled.
 
 ### During Task Execution
 - Look at the task details in the task list
