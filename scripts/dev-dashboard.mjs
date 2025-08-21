@@ -32,6 +32,8 @@ const rawInputPath = npmFlagPath || argProvidedPath || process.env.PROJECT_PATH;
 // Compute absolute project path if provided; default to current working directory
 const projectPath = rawInputPath ? resolve(process.cwd(), rawInputPath) : process.cwd();
 
+console.log("Starting dashboard with project path:", projectPath);
+
 // Spawn vite with our config, without forwarding the positional arg (to avoid overriding Vite root)
 const viteArgs = ['--config', 'src/dashboard_frontend/vite.config.ts'];
 
