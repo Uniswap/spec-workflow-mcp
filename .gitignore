@@ -137,8 +137,10 @@ dist
 
 # AI
 
-# Don't ignore .claude directory entirely - we want to track agents and plans
+# Don't ignore .claude directory entirely - we want to track agents
 .claude
+!.claude/agents/
+!.claude/agents/**
 .serena
 
 # Spec Workflow

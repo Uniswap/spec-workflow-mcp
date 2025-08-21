@@ -3,6 +3,8 @@ import { hexToColorObject, isValidHex } from './colors';
 import { Markdown } from '../markdown/Markdown';
 import { TextInputModal } from '../modals/TextInputModal';
 import { ConfirmationModal } from '../modals/ConfirmationModal';
+import { SelectionTooltip } from '../../components/tooltip';
+import { TooltipPosition } from '../../components/tooltip/types';
 
 export type ApprovalComment = {
   type: 'general' | 'selection';
@@ -210,26 +212,42 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
   }>({ isOpen: false, selectedText: '', isEditing: false });
   const [generalCommentModalOpen, setGeneralCommentModalOpen] = useState(false);
   const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; commentIndex: number }>({ isOpen: false, commentIndex: -1 });
+  
+  // Tooltip state
+  const [tooltipState, setTooltipState] = useState<{
+    isVisible: boolean;
+    position: TooltipPosition | null;
+    selectedText: string;
+  }>({ isVisible: false, position: null, selectedText: '' });
 
   // Generate unique ID for new comments
   const generateCommentId = () => `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  function handleSelectionMouseUp() {
+  function handleSelectionMouseUp(event: React.MouseEvent) {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim() || '';
-    if (!selectedText) return;
+    if (!selectedText) {
+      // Hide tooltip if no selection
+      setTooltipState({ isVisible: false, position: null, selectedText: '' });
+      return;
+    }
     
-    // Open modal for adding comment
-    setModalState({
-      isOpen: true,
-      selectedText,
-      isEditing: false
+    // Get selection position for tooltip
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    
+    // Show tooltip instead of modal
+    setTooltipState({
+      isVisible: true,
+      position: {
+        x: rect.left + rect.width / 2, // Center of selection
+        y: rect.top, // Top of selection
+        strategy: 'fixed'
+      },
+      selectedText
     });
     
-    // Clear selection after a brief delay to prevent flicker
-    setTimeout(() => {
-      try { selection?.removeAllRanges(); } catch {}
-    }, 50);
+    // Keep selection active for tooltip (don't clear immediately)
   }
 
   function handleHighlightClick(commentId: string) {
@@ -269,6 +287,36 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
 
   function handleModalClose() {
     setModalState({ isOpen: false, selectedText: '', isEditing: false });
+  }
+
+  function handleTooltipAddComment() {
+    // Open modal with the selected text from tooltip
+    setModalState({
+      isOpen: true,
+      selectedText: tooltipState.selectedText,
+      isEditing: false
+    });
+    
+    // Hide tooltip
+    setTooltipState({ isVisible: false, position: null, selectedText: '' });
+    
+    // Clear text selection
+    setTimeout(() => {
+      try {
+        window.getSelection()?.removeAllRanges();
+      } catch {}
+    }, 50);
+  }
+
+  function handleTooltipDismiss() {
+    setTooltipState({ isVisible: false, position: null, selectedText: '' });
+    
+    // Clear text selection
+    setTimeout(() => {
+      try {
+        window.getSelection()?.removeAllRanges();
+      } catch {}
+    }, 50);
   }
 
   function addGeneral() {
@@ -528,6 +576,17 @@ export function ApprovalsAnnotator({ content, comments, onCommentsChange, viewMo
         cancelText="Cancel"
         variant="danger"
       />
+      
+      {/* Selection Tooltip */}
+      {tooltipState.position && (
+        <SelectionTooltip
+          isVisible={tooltipState.isVisible}
+          position={tooltipState.position}
+          selectedText={tooltipState.selectedText}
+          onAddComment={handleTooltipAddComment}
+          onDismiss={handleTooltipDismiss}
+        />
+      )}
     </div>
   );
 }
