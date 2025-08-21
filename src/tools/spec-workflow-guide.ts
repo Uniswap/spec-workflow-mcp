@@ -142,7 +142,24 @@ First, generate an initial set of requirements in EARS format based on the featu
    - "[platform] [feature] technical limitations"
    - "[industry] compliance requirements [feature-type]"
 
-3. **Generate requirements content**
+3. **Agent Orchestration (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - Check for available specialized agents using the orchestrate-with-agents TOOL
+   - The orchestrator will intelligently delegate requirements generation to appropriate agents
+   - Example: Product managers, business analysts, or requirements specialists
+   - The orchestrator will aggregate results from multiple agents if beneficial
+   - If no suitable agents are found, proceed with standard workflow
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Generate requirements for [feature]",
+     phase: "requirements",
+     context: { steeringDocs, userDescription, marketResearch }
+   )
+   \`\`\`
+
+4. **Generate requirements content**
    - Generate an initial version based on the user's rough idea WITHOUT asking sequential questions first
    - Use the requirements template structure from the get-template-context TOOL output
    - Format with:
@@ -155,14 +172,14 @@ First, generate an initial set of requirements in EARS format based on the featu
    - Consider edge cases, user experience, technical constraints, and success criteria
    - Reference steering documents where applicable
 
-4. **Create the document using the create-spec-doc TOOL**
+5. **Create the document using the create-spec-doc TOOL**
    Call the create-spec-doc TOOL with:
    - projectPath: The project root path
    - specName: The feature name in kebab-case
    - document: "requirements"
    - content: Your requirements following the template
 
-5. **Request User Approval Using MCP Tools**
+6. **Request User Approval Using MCP Tools**
    - Use the request-approval TOOL to create an approval request:
      - title: "Requirements Phase: [spec-name] - Ready for Review"
      - filePath: ".spec-workflow/specs/[spec-name]/requirements.md"
@@ -243,7 +260,23 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "web performance optimization techniques 2025"
    - "accessibility patterns [framework] WCAG 2025"
 
-6. **Generate design content**
+6. **Agent Orchestration (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - The orchestrator may parallelize design work to multiple specialists
+   - Example: Backend architects, frontend developers, database designers, security experts
+   - Each agent focuses on their area of expertise
+   - Results are aggregated into a comprehensive design
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Create technical design based on requirements",
+     phase: "design",
+     context: { requirements, steeringDocs, codebaseAnalysis, researchFindings }
+   )
+   \`\`\`
+
+7. **Generate design content**
    - Use the design template structure from initial get-template-context TOOL output
    - Create a detailed design document incorporating research findings
    - Include the following sections:
@@ -261,14 +294,14 @@ After the user approves the Requirements, develop a comprehensive design documen
    - Highlight design decisions and their rationales
    - Ensure the design addresses all feature requirements
 
-7. **Create the document using the create-spec-doc TOOL**
+8. **Create the document using the create-spec-doc TOOL**
    Call the create-spec-doc TOOL with:
    - projectPath: The project root path
    - specName: The same feature name used for requirements
    - document: "design"
    - content: Your design following the template
 
-8. **Request User Approval Using MCP Tools**
+9. **Request User Approval Using MCP Tools**
    - Use the request-approval TOOL to create an approval request:
      - title: "Design Phase: [spec-name] - Ready for Review"
      - filePath: ".spec-workflow/specs/[spec-name]/design.md"
@@ -297,7 +330,22 @@ After the user approves the Design, create an actionable implementation plan wit
    - If you JUST created the requirements.md and design.md in this conversation, you already have the context
    - Only call get-spec-context TOOL if you're starting fresh on an existing spec or returning to work after a break
 
-2. **Generate Implementation Task List**
+2. **Agent Orchestration (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - The orchestrator can delegate task planning to project management specialists
+   - Task breakdown may be enhanced with agent recommendations
+   - Each task can be annotated with suggested agent assignments
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Create implementation task list from design",
+     phase: "tasks",
+     context: { requirements, design, codebaseAnalysis }
+   )
+   \`\`\`
+
+3. **Generate Implementation Task List**
    Convert the feature design into a series of prompts for a code-generation LLM that will implement each step in a test-driven manner. Focus ONLY on tasks that involve writing, modifying, or testing code.
 
    **Atomic Task Requirements (CRITICAL FOR AGENT EXECUTION)**:
@@ -340,14 +388,14 @@ After the user approves the Design, create an actionable implementation plan wit
      - _Leverage: src/types/base.ts_
    \`\`\`
 
-3. **Create the document using the create-spec-doc TOOL**
+4. **Create the document using the create-spec-doc TOOL**
    Call the create-spec-doc TOOL with:
    - projectPath: The project root path
    - specName: The same feature name used previously
    - document: "tasks"
    - content: Your task list following the template
 
-4. **Request User Approval Using MCP Tools**
+5. **Request User Approval Using MCP Tools**
    - Use the request-approval TOOL to create an approval request:
      - title: "Tasks Phase: [spec-name] - Ready for Review"
      - filePath: ".spec-workflow/specs/[spec-name]/tasks.md"
