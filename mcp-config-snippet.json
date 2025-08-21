@@ -1,0 +1,14 @@
+{
+  "spec-workflow-forked": {
+    "type": "stdio",
+    "command": "node",
+    "args": [
+      "/Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp/dist/index.js",
+      "/Users/nick.koutrelakos/Projects/universe/"
+    ],
+    "env": {
+      "PROJECT_PATH": "/Users/nick.koutrelakos/Projects/universe/",
+      "DASHBOARD_PORT": "3456"
+    }
+  }
+}

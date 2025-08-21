@@ -118,6 +118,23 @@ Follow this exact sequence using the MCP tools:
    - Find integration points: Locate where new feature will connect with existing systems
    - Document findings: Note what can be reused vs. what needs to be built from scratch
 
+3. **Agent Orchestration for Codebase Analysis (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - The orchestrator can parallelize codebase analysis across multiple specialized agents
+   - Code archaeologists can identify patterns and conventions
+   - Architecture analysts can map system boundaries and integration points
+   - Component specialists can catalog reusable utilities and modules
+   - Results are aggregated into a comprehensive codebase understanding
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Analyze existing codebase for [feature] implementation",
+     phase: "setup",
+     context: { projectStructure, featureDescription, steeringDocs }
+   )
+   \`\`\`
+
 ## PHASE 1: Requirements Gathering
 
 First, generate an initial set of requirements in EARS format based on the feature idea, then iterate with the user to refine them until they are complete and accurate. Focus on writing requirements which will later be turned into a design.
@@ -142,7 +159,24 @@ First, generate an initial set of requirements in EARS format based on the featu
    - "[platform] [feature] technical limitations"
    - "[industry] compliance requirements [feature-type]"
 
-3. **Agent Orchestration (When Available)**
+3. **Agent Orchestration for Market Research (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - Market research agents can parallelize competitive analysis
+   - UX research specialists can identify user experience patterns
+   - Compliance experts can review regulatory requirements
+   - Industry analysts can benchmark against best practices
+   - All findings are synthesized into comprehensive market insights
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Research market standards and user expectations for [feature]",
+     phase: "requirements-research",
+     context: { featureDescription, industry, targetAudience }
+   )
+   \`\`\`
+
+4. **Agent Orchestration for Requirements Generation (When Available)**
    If the orchestrate-with-agents TOOL is available:
    - Check for available specialized agents using the orchestrate-with-agents TOOL
    - The orchestrator will intelligently delegate requirements generation to appropriate agents
@@ -159,7 +193,7 @@ First, generate an initial set of requirements in EARS format based on the featu
    )
    \`\`\`
 
-4. **Generate requirements content**
+5. **Generate requirements content**
    - Generate an initial version based on the user's rough idea WITHOUT asking sequential questions first
    - Use the requirements template structure from the get-template-context TOOL output
    - Format with:
@@ -172,14 +206,14 @@ First, generate an initial set of requirements in EARS format based on the featu
    - Consider edge cases, user experience, technical constraints, and success criteria
    - Reference steering documents where applicable
 
-5. **Create the document using the create-spec-doc TOOL**
+6. **Create the document using the create-spec-doc TOOL**
    Call the create-spec-doc TOOL with:
    - projectPath: The project root path
    - specName: The feature name in kebab-case
    - document: "requirements"
    - content: Your requirements following the template
 
-6. **Request User Approval Using MCP Tools**
+7. **Request User Approval Using MCP Tools**
    - Use the request-approval TOOL to create an approval request:
      - title: "Requirements Phase: [spec-name] - Ready for Review"
      - filePath: ".spec-workflow/specs/[spec-name]/requirements.md"
@@ -223,13 +257,47 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "[framework] performance benchmarks 2025"
    - "[library] vs [alternative] comparison 2025"
 
-3. **Codebase Research** (MANDATORY)
+3. **Agent Orchestration for Technology Research (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - Security experts can audit dependencies for vulnerabilities
+   - Performance engineers can benchmark technology choices
+   - Architecture specialists can evaluate design patterns
+   - DevOps engineers can assess deployment implications
+   - Results are combined into technology recommendations
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Research technology stack and dependencies for [feature]",
+     phase: "design-tech-research",
+     context: { requirements, techStack, proposedPackages }
+   )
+   \`\`\`
+
+4. **Codebase Research** (MANDATORY)
    - Map existing patterns: Identify data models, API patterns, component structures
    - Catalog reusable utilities: Find validation functions, helpers, middleware, hooks
    - Document architectural decisions: Note existing tech stack, state management, routing patterns
    - Identify integration points: Map how new feature connects to existing auth, database, APIs
 
-4. **Package Version Research** (MANDATORY - Use Web Search When Available)
+5. **Agent Orchestration for Codebase Analysis (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - Frontend specialists can analyze UI components and patterns
+   - Backend engineers can map API and data layer structures
+   - Infrastructure experts can identify deployment patterns
+   - Integration specialists can trace system boundaries
+   - Findings are merged into a comprehensive codebase map
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Deep analysis of existing codebase for [feature] integration",
+     phase: "design-codebase-analysis",
+     context: { requirements, projectStructure, existingPatterns }
+   )
+   \`\`\`
+
+6. **Package Version Research** (MANDATORY - Use Web Search When Available)
    For any new dependencies you're considering:
    - **Current Version Check**: Search for the latest stable version and release notes
    - **Security Audit**: Look up recent CVE reports and security advisories
@@ -243,7 +311,24 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "[package-name] vs [alternative] performance bundle size"
    - "[package-name] maintenance status github activity"
 
-5. **Design Pattern Research** (MANDATORY - Use Web Search When Available)
+7. **Agent Orchestration for Package Analysis (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - Security analysts can audit packages for known vulnerabilities
+   - Performance engineers can analyze bundle sizes and runtime impact
+   - Maintenance reviewers can assess package health and community support
+   - Compatibility experts can verify version matrix requirements
+   - All assessments are consolidated into package recommendations
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Analyze and validate package dependencies for [feature]",
+     phase: "design-package-analysis",
+     context: { proposedPackages, existingDependencies, securityRequirements }
+   )
+   \`\`\`
+
+8. **Design Pattern Research** (MANDATORY - Use Web Search When Available)
    Research modern architectural patterns and design approaches:
    - **Architectural Patterns**: Look up current best practices for your specific use case
    - **State Management**: Research modern state management patterns and libraries
@@ -260,7 +345,24 @@ After the user approves the Requirements, develop a comprehensive design documen
    - "web performance optimization techniques 2025"
    - "accessibility patterns [framework] WCAG 2025"
 
-6. **Agent Orchestration (When Available)**
+9. **Agent Orchestration for Design Pattern Research (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - Architecture experts can recommend appropriate patterns
+   - Performance specialists can suggest optimization strategies
+   - Accessibility engineers can ensure inclusive design patterns
+   - Testing specialists can propose verification approaches
+   - All recommendations are integrated into design guidelines
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Research and recommend design patterns for [feature]",
+     phase: "design-pattern-research",
+     context: { requirements, techStack, architectureGoals }
+   )
+   \`\`\`
+
+10. **Agent Orchestration for Comprehensive Design (When Available)**
    If the orchestrate-with-agents TOOL is available:
    - The orchestrator may parallelize design work to multiple specialists
    - Example: Backend architects, frontend developers, database designers, security experts
@@ -276,7 +378,7 @@ After the user approves the Requirements, develop a comprehensive design documen
    )
    \`\`\`
 
-7. **Generate design content**
+11. **Generate design content**
    - Use the design template structure from initial get-template-context TOOL output
    - Create a detailed design document incorporating research findings
    - Include the following sections:
@@ -294,14 +396,14 @@ After the user approves the Requirements, develop a comprehensive design documen
    - Highlight design decisions and their rationales
    - Ensure the design addresses all feature requirements
 
-8. **Create the document using the create-spec-doc TOOL**
+12. **Create the document using the create-spec-doc TOOL**
    Call the create-spec-doc TOOL with:
    - projectPath: The project root path
    - specName: The same feature name used for requirements
    - document: "design"
    - content: Your design following the template
 
-9. **Request User Approval Using MCP Tools**
+13. **Request User Approval Using MCP Tools**
    - Use the request-approval TOOL to create an approval request:
      - title: "Design Phase: [spec-name] - Ready for Review"
      - filePath: ".spec-workflow/specs/[spec-name]/design.md"
@@ -519,7 +621,25 @@ After completing all phases with user approval, the implementation phase can be 
    - Use the spec-status TOOL to see overall progress
    - Use the manage-tasks TOOL with action: "list" to see all tasks and their current status
 
-2. **Begin Task Execution**
+2. **Agent Orchestration for Implementation (When Available)**
+   If the orchestrate-with-agents TOOL is available:
+   - The orchestrator can assign tasks to specialized implementation agents
+   - Frontend tasks go to UI/React specialists
+   - Backend tasks go to API/database experts
+   - Testing tasks go to QA engineers
+   - Infrastructure tasks go to DevOps specialists
+   - Multiple independent tasks can be executed in parallel
+   
+   Example orchestration call:
+   \`\`\`
+   orchestrate-with-agents(
+     task: "Execute implementation task: [task-description]",
+     phase: "implementation",
+     context: { taskDetails, requirements, design, existingCode }
+   )
+   \`\`\`
+
+3. **Begin Task Execution**
    - Inform the user: "Starting implementation of [spec-name]. I'll work through each task systematically."
    - Use the manage-tasks TOOL with action: "next-pending" to get the first/next task
    - Follow the TASK EXECUTION PROTOCOL for each task until all are complete
@@ -543,6 +663,26 @@ When users request task execution:
 - ALWAYS ensure you have read the spec's requirements.md, design.md and tasks.md files
 - Executing tasks without the requirements or design will lead to inaccurate implementations
 - Use get-spec-context TOOL if needed to load all spec documents
+
+### Agent Orchestration for Task Execution (When Available)
+If the orchestrate-with-agents TOOL is available:
+- Analyze task complexity and requirements
+- Select agents with matching expertise for the specific task
+- For complex tasks, multiple agents can collaborate
+- Testing agents can verify implementation alongside development
+- The orchestrator ensures task requirements are fully met
+
+Example orchestration call:
+\`\`\`
+orchestrate-with-agents(
+  task: "Implement [specific-task-from-list]",
+  phase: "task-execution",
+  context: { taskId, taskDetails, requirements, design, relatedCode },
+  preferences: { 
+    preferredCapabilities: ["frontend", "testing"] // Based on task type
+  }
+)
+\`\`\`
 
 ### During Task Execution
 - Look at the task details in the task list
