@@ -264,11 +264,18 @@ First, generate an initial set of requirements in EARS format based on the featu
    - Wait for the user to say "Review" after they've completed their dashboard review
    - Use the get-approval-status TOOL to check approval status
    - If status is "needs-revision": 
-     a) Review the detailed feedback carefully
-     b) Make modifications to address all feedback
-     c) Call create-spec-doc TOOL again with the revised document content
-     d) Create a NEW approval request using request-approval TOOL
-     e) Continue the feedback-revision cycle until approved
+     a) Review the detailed feedback carefully, including:
+        - General feedback in the 'response' field
+        - Specific text-based comments in the 'comments' array (if present)
+        - The 'revisionPrompt' field which provides structured guidance
+     b) For each comment with 'selectedText':
+        - Locate the exact text in your document
+        - Apply the requested change to that specific section
+        - Ensure the change maintains document consistency
+     c) Address all general comments throughout the document
+     d) Call create-spec-doc TOOL again with the fully revised document content
+     e) Create a NEW approval request using request-approval TOOL
+     f) Continue the feedback-revision cycle until approved
    - Proceed to Phase 2 only after receiving "approved" status
    - Once approved, use the delete-approval TOOL to clean up the approval request
 
@@ -493,11 +500,18 @@ After the user approves the Requirements, develop a comprehensive design documen
    - Wait for the user to say "Review" after they've completed their dashboard review
    - Use the get-approval-status TOOL to check approval status
    - If status is "needs-revision":
-     a) Review the detailed feedback carefully
-     b) Make modifications to address all feedback
-     c) Call create-spec-doc TOOL again with the revised document content
-     d) Create a NEW approval request using request-approval TOOL
-     e) Continue the feedback-revision cycle until approved
+     a) Review the detailed feedback carefully, including:
+        - General feedback in the 'response' field
+        - Specific text-based comments in the 'comments' array (if present)
+        - The 'revisionPrompt' field which provides structured guidance
+     b) For each comment with 'selectedText':
+        - Locate the exact text in your document
+        - Apply the requested change to that specific section
+        - Ensure the change maintains document consistency
+     c) Address all general comments throughout the document
+     d) Call create-spec-doc TOOL again with the fully revised document content
+     e) Create a NEW approval request using request-approval TOOL
+     f) Continue the feedback-revision cycle until approved
    - Proceed to Phase 3 only after receiving "approved" status
    - Once approved, use the delete-approval TOOL to clean up the approval request
 
@@ -595,11 +609,18 @@ After the user approves the Design, create an actionable implementation plan wit
    - Wait for the user to say "Review" after they've completed their dashboard review
    - Use the get-approval-status TOOL to check approval status
    - If status is "needs-revision":
-     a) Review the detailed feedback carefully
-     b) Make modifications to address all feedback
-     c) Call create-spec-doc TOOL again with the revised document content
-     d) Create a NEW approval request using request-approval TOOL
-     e) Continue the feedback-revision cycle until approved
+     a) Review the detailed feedback carefully, including:
+        - General feedback in the 'response' field
+        - Specific text-based comments in the 'comments' array (if present)
+        - The 'revisionPrompt' field which provides structured guidance
+     b) For each comment with 'selectedText':
+        - Locate the exact text in your document
+        - Apply the requested change to that specific section
+        - Ensure the change maintains document consistency
+     c) Address all general comments throughout the document
+     d) Call create-spec-doc TOOL again with the fully revised document content
+     e) Create a NEW approval request using request-approval TOOL
+     f) Continue the feedback-revision cycle until approved
    - Once approved, use the delete-approval TOOL to clean up the approval request
    - Inform the user: "The spec workflow is complete! You can begin executing tasks by using the manage-tasks tool or clicking 'Start task' in the dashboard."
 
@@ -631,7 +652,11 @@ After the user approves the Design, create an actionable implementation plan wit
 - **CRITICAL**: Only provide filePath in request-approval TOOL - NEVER include document content
 - Use get-approval-status TOOL to poll until status is "approved"
 - If status is "needs-revision": 
-  a) Review feedback, b) Revise using create-spec-doc TOOL, c) Create NEW approval request (filePath only, NO content)
+  a) Review all feedback including 'response', 'comments' array with context, and 'revisionPrompt' guidance
+  b) Apply specific text-based changes from comments with 'selectedText' 
+  c) Address general comments throughout the document
+  d) Revise using create-spec-doc TOOL with all feedback incorporated
+  e) Create NEW approval request (filePath only, NO content)
 - Continue revision cycle until approval status is "approved"
 - **MANDATORY CLEANUP**: Once approved, immediately use delete-approval TOOL to remove the approval request
 - The approval system provides structured feedback through the dashboard interface
