@@ -140,3 +140,7 @@ dist
 # Don't ignore .claude directory entirely - we want to track agents and plans
 .claude
 .serena
+
+# Spec Workflow
+
+.spec-workflow/
