@@ -34,6 +34,13 @@
   ],
   "author": "",
   "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uniswap/spec-workflow-mcp.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "dependencies": {
     "@fastify/static": "^7.0.4",
     "@fastify/websocket": "^8.2.1",
