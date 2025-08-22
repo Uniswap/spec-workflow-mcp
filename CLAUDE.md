@@ -127,6 +127,7 @@ When making changes:
 2. **For dashboard changes**: Modify files in `src/dashboard_frontend/`
 3. **For tool additions**: Add new tool in `src/tools/` and register in `src/tools/index.ts`
 4. **For agent modifications**: Update markdown files in `.claude/agents/`
+5. Always run `npm run typecheck` after changes to ensure there are no TypeScript errors
 
 ## Testing Changes
 
