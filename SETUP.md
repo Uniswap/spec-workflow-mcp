@@ -17,11 +17,11 @@
   "type": "stdio",
   "command": "node",
   "args": [
-    "/Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp/dist/index.js",
-    "/Users/nick.koutrelakos/Projects/universe/"
+    "/path/to/spec-workflow-mcp/dist/index.js",
+    "/path/to/your/project/"
   ],
   "env": {
-    "PROJECT_PATH": "/Users/nick.koutrelakos/Projects/universe/",
+    "PROJECT_PATH": "/path/to/your/project/",
     "DASHBOARD_PORT": "3456"
   }
 }
@@ -34,12 +34,12 @@
 If you want to use it like the original but with your changes:
 
 ```bash
-cd /Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp
+cd /path/to/spec-workflow-mcp
 npm link
 
 # Then in your project directory:
-cd /Users/nick.koutrelakos/Projects/universe
-npm link @pimzino/spec-workflow-mcp
+cd /path/to/your/project
+npm link @uniswap/spec-workflow-mcp
 ```
 
 ### Method 3: Direct Execution (Testing)
@@ -47,8 +47,8 @@ npm link @pimzino/spec-workflow-mcp
 Run the MCP server directly:
 
 ```bash
-cd /Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp
-./launch-mcp.sh /Users/nick.koutrelakos/Projects/universe/
+cd /path/to/spec-workflow-mcp
+./launch-mcp.sh /path/to/your/project/
 ```
 
 ## Installing the Orchestration Agents
@@ -60,7 +60,7 @@ Copy the agent definitions to your Claude Code agents directory:
 cp .claude/agents/*.md ~/.claude/agents/
 
 # OR project-specific (for current project only)
-cp .claude/agents/*.md /Users/nick.koutrelakos/Projects/universe/.claude/agents/
+cp .claude/agents/*.md /path/to/your/project/.claude/agents/
 ```
 
 ## Verifying the Setup
@@ -74,6 +74,7 @@ cp .claude/agents/*.md /Users/nick.koutrelakos/Projects/universe/.claude/agents/
    - You should see `agent-orchestrator` and `agent-capability-analyst`
 
 3. Test orchestration:
+
    ```
    Call orchestrate-with-agents with:
    - task: "Test orchestration"
@@ -83,6 +84,7 @@ cp .claude/agents/*.md /Users/nick.koutrelakos/Projects/universe/.claude/agents/
 ## Configuration Options
 
 Edit `.spec-workflow/orchestration.yaml` in your project to customize:
+
 - Enable/disable orchestration
 - Set capability preferences
 - Adjust confidence thresholds
@@ -91,16 +93,19 @@ Edit `.spec-workflow/orchestration.yaml` in your project to customize:
 ## Troubleshooting
 
 ### "Tool not found" error
+
 - Ensure you've run `npm install && npm run build`
 - Check that `/dist/index.js` exists
 - Verify the path in your Claude configuration
 
 ### "Agent orchestrator not available"
+
 - Copy agent definitions to `.claude/agents/`
 - Ensure Claude Code can read the agents directory
 - Check file permissions
 
 ### Changes not taking effect
+
 - Restart Claude Code completely
 - Clear any MCP server caches
 - Check for typos in configuration
@@ -108,9 +113,10 @@ Edit `.spec-workflow/orchestration.yaml` in your project to customize:
 ## Dashboard Access
 
 When running, access the dashboard at:
-http://localhost:3456
+<http://localhost:3456>
 
 This shows:
+
 - Spec workflow progress
 - Task status
 - Approval requests

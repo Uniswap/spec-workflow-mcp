@@ -1,5 +1,5 @@
 {
-  "name": "@pimzino/spec-workflow-mcp",
+  "name": "@uniswap/spec-workflow-mcp",
   "version": "0.0.18",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",

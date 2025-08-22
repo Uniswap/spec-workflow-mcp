@@ -1,6 +1,6 @@
 # Spec Workflow MCP
 
-[![npm version](https://img.shields.io/npm/v/@pimzino/spec-workflow-mcp)](https://www.npmjs.com/package/@pimzino/spec-workflow-mcp)
+[![npm version](https://img.shields.io/npm/v/@uniswap/spec-workflow-mcp)](https://www.npmjs.com/package/@uniswap/spec-workflow-mcp)
 
 A Model Context Protocol (MCP) server that provides structured spec-driven development workflow tools for AI-assisted software development, featuring a real-time web dashboard for monitoring and managing your project's progress.
 
@@ -51,7 +51,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-         "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
        }
      }
    }
@@ -61,13 +61,13 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 2. **Start the web dashboard** (**REQUIRED**):
    ```bash
    # Default (uses ephemeral port)
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
    
    # Custom port
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
    
    # Alternative syntax
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard --port=8080
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port=8080
    ```
    
    **Options:**
@@ -113,7 +113,7 @@ Configure in your Augment settings:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
@@ -125,9 +125,9 @@ Configure in your Augment settings:
 
 Add to your MCP configuration:
 ```bash
-claude mcp add spec-workflow npx @pimzino/spec-workflow-mcp@latest /path/to/your/project
+claude mcp add spec-workflow npx @uniswap/spec-workflow-mcp@latest /path/to/your/project
 ```
-<strong> Note: </strong> You may need to wrap the command in cmd.exe /c "npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project" for Windows.
+<strong> Note: </strong> You may need to wrap the command in cmd.exe /c "npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project" for Windows.
 </details>
 
 <details>
@@ -139,7 +139,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
@@ -155,7 +155,7 @@ Add to your MCP server configuration:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
@@ -171,7 +171,7 @@ Add to your Continue configuration:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
@@ -187,7 +187,7 @@ Add to your Cursor settings (`settings.json`):
   "mcp.servers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
@@ -204,7 +204,7 @@ Add to your `opencode.json` configuration file (either global at `~/.config/open
   "mcp": {
     "spec-workflow": {
       "type": "local",
-      "command": ["npx", "-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"],
+      "command": ["npx", "-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
       "enabled": true
     }
   }

@@ -37,8 +37,8 @@ npm run build:dashboard  # Build dashboard only
 
 ```bash
 # With dashboard (required for approvals and tracking)
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard
-npx -y @pimzino/spec-workflow-mcp@latest /path/to/project --dashboard --port 3000
+npx -y @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
+npx -y @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard --port 3000
 
 # For local development
 npm run dev /path/to/project -- --dashboard

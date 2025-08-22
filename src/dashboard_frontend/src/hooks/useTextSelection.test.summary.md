@@ -2,7 +2,7 @@
 
 ## Test Coverage Overview
 
-The enhanced test file `/Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp/src/dashboard_frontend/src/hooks/useTextSelection.test.ts` provides comprehensive coverage for all the required behaviors:
+The enhanced test file `src/dashboard_frontend/src/hooks/useTextSelection.test.ts` provides comprehensive coverage for all the required behaviors:
 
 ## ✅ Test Categories Implemented
 

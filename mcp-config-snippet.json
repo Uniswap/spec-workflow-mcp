@@ -3,11 +3,11 @@
     "type": "stdio",
     "command": "node",
     "args": [
-      "/Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp/dist/index.js",
-      "/Users/nick.koutrelakos/Projects/universe/"
+      "/path/to/spec-workflow-mcp/dist/index.js",
+      "/path/to/your/project/"
     ],
     "env": {
-      "PROJECT_PATH": "/Users/nick.koutrelakos/Projects/universe/",
+      "PROJECT_PATH": "/path/to/your/project/",
       "DASHBOARD_PORT": "3456"
     }
   }
