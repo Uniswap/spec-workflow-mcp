@@ -13,6 +13,7 @@ import { requestApprovalTool, requestApprovalHandler } from './request-approval.
 import { getApprovalStatusTool, getApprovalStatusHandler } from './get-approval-status.js';
 import { deleteApprovalTool, deleteApprovalHandler } from './delete-approval.js';
 import { refreshTasksTool, refreshTasksHandler } from './refresh-tasks.js';
+import { orchestrateWithAgentsTool, orchestrateWithAgentsHandler } from './orchestrate-with-agents.js';
 import { ToolContext, ToolResponse, MCPToolResponse, toMCPResponse } from '../types.js';
 
 export function registerTools(): Tool[] {
@@ -30,7 +31,8 @@ export function registerTools(): Tool[] {
     requestApprovalTool,
     getApprovalStatusTool,
     deleteApprovalTool,
-    refreshTasksTool
+    refreshTasksTool,
+    orchestrateWithAgentsTool
   ];
 }
 
@@ -81,6 +83,9 @@ export async function handleToolCall(name: string, args: any, context: ToolConte
         break;
       case 'refresh-tasks':
         response = await refreshTasksHandler(args, context);
+        break;
+      case 'orchestrate-with-agents':
+        response = await orchestrateWithAgentsHandler(args, context);
         break;
       default:
         throw new Error(`Unknown tool: ${name}`);

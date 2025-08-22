@@ -1,6 +1,6 @@
 {
-  "name": "@pimzino/spec-workflow-mcp",
-  "version": "0.0.18",
+  "name": "@uniswap/spec-workflow-mcp",
+  "version": "0.1.0",
   "description": "MCP server for spec-driven development workflow with real-time web dashboard",
   "main": "dist/index.js",
   "type": "module",
@@ -17,10 +17,14 @@
     "copy-static": "node scripts/copy-static.cjs",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "dev:dashboard": "vite --config src/dashboard_frontend/vite.config.ts",
+    "dev:dashboard": "node scripts/dev-dashboard.mjs",
     "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts",
     "clean": "rimraf dist",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish",
+    "typecheck": "npx tsc --noEmit"
   },
   "keywords": [
     "mcp",
@@ -34,9 +38,17 @@
   ],
   "author": "",
   "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uniswap/spec-workflow-mcp.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "dependencies": {
     "@fastify/static": "^7.0.4",
     "@fastify/websocket": "^8.2.1",
+    "@floating-ui/react": "^0.26.0",
     "@modelcontextprotocol/sdk": "^0.5.0",
     "chokidar": "^3.5.3",
     "clsx": "^2.1.1",
@@ -51,7 +63,9 @@
     "simple-git": "^3.28.0"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.5",
     "@tailwindcss/typography": "^0.5.16",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",

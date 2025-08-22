@@ -1,8 +1,10 @@
 # Spec Workflow MCP
 
-[![npm version](https://img.shields.io/npm/v/@pimzino/spec-workflow-mcp)](https://www.npmjs.com/package/@pimzino/spec-workflow-mcp)
+[![GitHub Package](https://img.shields.io/badge/GitHub%20Package-@uniswap%2Fspec--workflow--mcp-blue)](https://github.com/uniswap/spec-workflow-mcp/packages)
 
 A Model Context Protocol (MCP) server that provides structured spec-driven development workflow tools for AI-assisted software development, featuring a real-time web dashboard for monitoring and managing your project's progress.
+
+> **Note:** This package is published to GitHub Packages. See [Installation](#installation) for setup instructions.
 
 <a href="https://glama.ai/mcp/servers/@Pimzino/spec-workflow-mcp">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@Pimzino/spec-workflow-mcp/badge" alt="Spec Workflow MCP server" />
@@ -11,6 +13,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 ## 📺 Showcase
 
 ### 🔄 Approval System in Action
+
 <a href="https://www.youtube.com/watch?v=C-uEa3mfxd0" target="_blank">
   <img src="https://img.youtube.com/vi/C-uEa3mfxd0/maxresdefault.jpg" alt="Approval System Demo" width="600">
 </a>
@@ -18,6 +21,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 *See how the approval system works: create documents, request approval through the dashboard, provide feedback, and track revisions.*
 
 ### 📊 Dashboard & Spec Management
+
 <a href="https://www.youtube.com/watch?v=g9qfvjLUWf8" target="_blank">
   <img src="https://img.youtube.com/vi/g9qfvjLUWf8/maxresdefault.jpg" alt="Dashboard Demo" width="600">
 </a>
@@ -32,6 +36,39 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 ---
 
+## Installation
+
+### Setting up GitHub Packages Access
+
+Since this package is published to GitHub Packages, you'll need to authenticate first:
+
+1. **Create a GitHub Personal Access Token (PAT)**:
+   - Go to GitHub Settings → Developer settings → Personal access tokens
+   - Create a token with `read:packages` scope
+   - Save the token securely
+
+2. **Configure npm to use GitHub Packages**:
+
+   ```bash
+   # Add to your ~/.npmrc or project .npmrc
+   @uniswap:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+   ```
+
+3. **Install the package**:
+
+   ```bash
+   npm install @uniswap/spec-workflow-mcp
+   ```
+
+### Using with npx
+
+For one-time use with npx, you can set the token as an environment variable:
+
+```bash
+NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
+```
+
 ## Features
 
 - **Structured Development Workflow** - Sequential spec creation (Requirements → Design → Tasks)
@@ -45,35 +82,40 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 ## Quick Start
 
+> **Prerequisites**: Ensure you have [configured GitHub Packages access](#setting-up-github-packages-access) before proceeding.
+
 1. **Add to your AI tool configuration** (see MCP Client Setup below):
+
    ```json
    {
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-         "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
        }
      }
    }
    ```
+
    **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
 
 2. **Start the web dashboard** (**REQUIRED**):
+
    ```bash
    # Default (uses ephemeral port)
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard
-   
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
+
    # Custom port
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
-   
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
+
    # Alternative syntax
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard --port=8080
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port=8080
    ```
-   
+
    **Options:**
    - `--dashboard` - Start the web dashboard (required)
    - `--port <number>` - Optional custom port (1024-65535). If not specified, an ephemeral port will be used
-   
+
    **IMPORTANT:** The dashboard is mandatory for the workflow to function. Without it:
    - Document approvals won't work
    - Task progress tracking will be disabled
@@ -87,16 +129,19 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 You can simply mention spec-workflow or whatever name you gave the MCP server in your conversation. The AI will handle the complete workflow automatically or you can use some of the example prompts below:
 
 ### Creating Specs
+
 - **"Create a spec for user authentication"** - Creates complete spec workflow for that feature
 - **"Create a spec called payment-system"** - Builds full requirements → design → tasks
 - **"Build a spec for @prd"** - Takes your existing PRD and creates the complete spec workflow from it
 - **"Create a spec for shopping-cart - include add to cart, quantity updates, and checkout integration"** - Detailed feature spec
 
 ### Getting Information
+
 - **"List my specs"** - Shows all specs and their current status
 - **"Show me the user-auth progress"** - Displays detailed progress information
 
 ### Implementation
+
 - **"Execute task 1.2 in spec user-auth"** - Runs a specific task from your spec
 - **Copy prompts from dashboard** - Use the "Copy Prompt" button in the task list on your dashboard
 
@@ -108,108 +153,122 @@ The agent automatically handles approval workflows, task management, and guides 
 <summary><strong>Augment Code</strong></summary>
 
 Configure in your Augment settings:
+
 ```json
 {
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
 ```
+
 </details>
 
 <details>
 <summary><strong>Claude Code CLI</strong></summary>
 
 Add to your MCP configuration:
+
 ```bash
-claude mcp add spec-workflow npx @pimzino/spec-workflow-mcp@latest /path/to/your/project
+claude mcp add spec-workflow npx @uniswap/spec-workflow-mcp@latest /path/to/your/project
 ```
-<strong> Note: </strong> You may need to wrap the command in cmd.exe /c "npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project" for Windows.
+
+<strong> Note: </strong> You may need to wrap the command in cmd.exe /c "npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project" for Windows.
 </details>
 
 <details>
 <summary><strong>Claude Desktop</strong></summary>
 
 Add to `claude_desktop_config.json`:
+
 ```json
 {
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
 ```
+
 </details>
 
 <details>
 <summary><strong>Cline/Claude Dev</strong></summary>
 
 Add to your MCP server configuration:
+
 ```json
 {
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
 ```
+
 </details>
 
 <details>
 <summary><strong>Continue IDE Extension</strong></summary>
 
 Add to your Continue configuration:
+
 ```json
 {
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
 ```
+
 </details>
 
 <details>
 <summary><strong>Cursor IDE</strong></summary>
 
 Add to your Cursor settings (`settings.json`):
+
 ```json
 {
   "mcp.servers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
     }
   }
 }
 ```
+
 </details>
 
 <details>
 <summary><strong>OpenCode</strong></summary>
 
 Add to your `opencode.json` configuration file (either global at `~/.config/opencode/opencode.json` or project-specific):
+
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
     "spec-workflow": {
       "type": "local",
-      "command": ["npx", "-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project"],
+      "command": ["npx", "-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
       "enabled": true
     }
   }
 }
 ```
+
 </details>
 
 > **Note:** Replace `/path/to/your/project` with the actual path to your project directory where you want the spec workflow to operate.
@@ -217,24 +276,29 @@ Add to your `opencode.json` configuration file (either global at `~/.config/open
 ## Available Tools
 
 ### Workflow Guides
+
 - `spec-workflow-guide` - Complete guide for the spec-driven workflow process
 - `steering-guide` - Guide for creating project steering documents
 
 ### Spec Management
+
 - `create-spec-doc` - Create/update spec documents (requirements, design, tasks)
 - `spec-list` - List all specs with status information
 - `spec-status` - Get detailed status of a specific spec
 - `manage-tasks` - Comprehensive task management for spec implementation
 
 ### Context & Templates
+
 - `get-template-context` - Get markdown templates for all document types
 - `get-steering-context` - Get project steering context and guidance
 - `get-spec-context` - Get context for a specific spec
 
 ### Steering Documents
+
 - `create-steering-doc` - Create project steering documents (product, tech, structure)
 
 ### Approval System
+
 - `request-approval` - Request user approval for documents
 - `get-approval-status` - Check approval status
 - `delete-approval` - Clean up completed approvals
@@ -250,6 +314,7 @@ The dashboard is a separate service that must be started manually alongside the 
 - **Dark Mode** - Automatically enabled for better readability
 
 ### Dashboard Features
+
 - **Spec Cards** - Overview of each spec with status indicators
 - **Document Navigation** - Switch between requirements, design, and tasks
 - **Task Management** - View task progress and copy implementation prompts
@@ -258,18 +323,23 @@ The dashboard is a separate service that must be started manually alongside the 
 ## Workflow Process
 
 ### 1. Project Setup (Recommended)
+
 ```
 steering-guide → create-steering-doc (product, tech, structure)
 ```
+
 Creates foundational documents to guide your project development.
 
 ### 2. Feature Development
+
 ```
 spec-workflow-guide → create-spec-doc → [review] → implementation
 ```
+
 Sequential process: Requirements → Design → Tasks → Implementation
 
 ### 3. Implementation Support
+
 - Use `get-spec-context` for detailed implementation context
 - Use `manage-tasks` to track task completion
 - Monitor progress via the web dashboard

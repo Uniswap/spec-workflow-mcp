@@ -136,7 +136,13 @@ dist
 .pnp.*
 
 # AI
-CLAUDE.md
+
+# Don't ignore .claude directory entirely - we want to track agents
 .claude
+!.claude/agents/
+!.claude/agents/**
 .serena
-AGENTS.md
+
+# Spec Workflow
+
+.spec-workflow/

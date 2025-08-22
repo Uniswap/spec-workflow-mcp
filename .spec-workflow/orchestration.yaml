@@ -1,0 +1,138 @@
+# Orchestration Configuration for spec-workflow-mcp
+# This file configures how AI agents are orchestrated throughout the workflow
+
+orchestration:
+  # Enable or disable agent orchestration
+  enabled: true
+  
+  # Orchestration mode
+  # - auto: Automatically use orchestration when agents are available
+  # - manual: Only use orchestration when explicitly requested
+  # - off: Never use orchestration
+  mode: auto
+
+# Preferences for agent selection
+# These are capability hints, NOT hardcoded agent names
+preferences:
+  
+  # Requirements phase preferences
+  requirements:
+    # Preferred capabilities for requirements generation
+    preferred_capabilities:
+      - "product management"
+      - "user research"
+      - "business analysis"
+      - "requirements gathering"
+    
+    # Capabilities to avoid during requirements
+    avoid_capabilities: []
+  
+  # Design phase preferences
+  design:
+    # Preferred capabilities for design work
+    preferred_capabilities:
+      - "system architecture"
+      - "technical design"
+      - "solution architecture"
+      - "backend development"
+      - "frontend development"
+      - "database design"
+    
+    # Capabilities to avoid during design
+    avoid_capabilities: []
+  
+  # Task planning phase preferences
+  tasks:
+    # Preferred capabilities for task breakdown
+    preferred_capabilities:
+      - "project management"
+      - "task planning"
+      - "estimation"
+      - "agile methodology"
+    
+    # Capabilities to avoid during task planning
+    avoid_capabilities: []
+  
+  # Implementation phase preferences
+  implementation:
+    # Let the orchestrator decide based on task content
+    preferred_capabilities: []
+    avoid_capabilities: []
+
+# Orchestration settings
+settings:
+  # Minimum confidence score (0-1) needed to use parallel agents
+  # If confidence is below this, use single agent or fallback
+  parallel_threshold: 0.7
+  
+  # Minimum confidence score (0-1) needed to use any agent
+  # Below this threshold, fall back to standard workflow
+  fallback_threshold: 0.4
+  
+  # Maximum number of agents to use in parallel
+  max_parallel_agents: 3
+  
+  # Whether to explain agent selection reasoning
+  explain_selection: true
+  
+  # Timeout for agent delegations (milliseconds)
+  delegation_timeout: 300000  # 5 minutes
+  
+  # Whether to cache agent capabilities for performance
+  cache_capabilities: true
+  
+  # Cache duration in milliseconds
+  cache_duration: 3600000  # 1 hour
+
+# Fallback behavior when no suitable agents are found
+fallback:
+  # Strategy when no agents match
+  # - standard: Use standard workflow
+  # - prompt: Prompt user for guidance
+  # - abort: Stop and require manual intervention
+  strategy: standard
+  
+  # Whether to notify user when falling back
+  notify_user: true
+  
+  # Suggest missing capabilities to user
+  suggest_capabilities: true
+
+# Performance tracking (future enhancement)
+performance:
+  # Track agent performance for better matching
+  track_performance: false
+  
+  # Use historical data to improve matching
+  adaptive_matching: false
+  
+  # Store performance metrics
+  store_metrics: false
+
+# Logging and debugging
+logging:
+  # Log orchestration decisions
+  log_decisions: true
+  
+  # Log agent outputs
+  log_outputs: false
+  
+  # Debug mode for detailed logging
+  debug: false
+
+# Integration settings
+integration:
+  # Check for orchestrator agent on startup
+  check_orchestrator: true
+  
+  # Auto-install orchestrator if missing
+  auto_install: false
+  
+  # Path to custom agents directory (optional)
+  # agents_path: ".claude/agents"
+
+# Notes:
+# - This configuration uses capability descriptions, not agent names
+# - The orchestrator will dynamically match agents based on their descriptions
+# - No agent names are hardcoded in the system
+# - The orchestrator uses LLM-based matching for flexibility
