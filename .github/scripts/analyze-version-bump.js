@@ -41,12 +41,12 @@ function getLatestTag() {
     // Get the most recent tag
     const tag = execSync('git describe --tags --abbrev=0 2>/dev/null || echo ""', { encoding: 'utf-8' }).trim();
     if (!tag) {
-      console.log('No previous tags found, will analyze all changes');
+      console.error('No previous tags found, will analyze all changes');
       return null;
     }
     return tag;
   } catch (error) {
-    console.log('No previous tags found, will analyze all changes');
+    console.error('No previous tags found, will analyze all changes');
     return null;
   }
 }
@@ -143,7 +143,7 @@ Do not include any explanation or additional text.`;
     return content;
   } catch (error) {
     console.error('Error calling Claude API:', error.message);
-    console.log('Defaulting to patch version bump');
+    console.error('Defaulting to patch version bump');
     return 'patch';
   }
 }
@@ -161,7 +161,7 @@ async function main() {
     const latestTag = getLatestTag();
     
     if (!latestTag) {
-      console.log('No previous version found. Defaulting to patch bump.');
+      console.error('No previous version found. Defaulting to patch bump.');
       console.log('patch');
       return;
     }
