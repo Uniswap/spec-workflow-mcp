@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.20] - 2025-08-22
+
+### Added
+- Added `--AutoStartDashboard` flag to automatically start and open dashboard when running MCP server
+- Added `--port` parameter support for MCP server mode (previously only worked with `--dashboard` mode)
+- Added comprehensive `--help` command with usage examples and parameter documentation
+- Added validation for unknown command-line flags with helpful error messages
+
+### Improved
+- Enhanced shutdown behavior messaging for MCP server mode
+- Removed duplicate console logging when using custom ports
+- Updated README with AutoStartDashboard configuration examples for all MCP clients
+- Clarified that MCP server lifecycle is controlled by the MCP client (not Ctrl+C)
+
+### Fixed
+- Fixed issue where browser would attempt to open twice with AutoStartDashboard
+- Fixed duplicate "Using custom port" messages in console output
+
+## [0.0.19] - 2025-08-21
+
+### Fixed
+- Fixed MCP server shutdown issues where server process would stay running after MCP client disconnects
+- Added proper stdio transport onclose handler to detect client disconnection
+- Added stdin monitoring for additional disconnect detection safety
+- Enhanced stop() method with better error handling and cleanup sequence
+
 ## [0.0.18] - 2025-08-17
 
 ### Improvements

@@ -1,0 +1,69 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </linearGradient>
+    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Main background -->
+  <circle cx="64" cy="64" r="60" fill="url(#bgGradient)" stroke="#1E40AF" stroke-width="2"/>
+  
+  <!-- Document stack representing specs -->
+  <g transform="translate(20, 25)">
+    <!-- Back document -->
+    <rect x="4" y="4" width="48" height="64" rx="4" fill="#CBD5E1" opacity="0.6"/>
+    <!-- Middle document -->
+    <rect x="2" y="2" width="48" height="64" rx="4" fill="#E2E8F0" opacity="0.8"/>
+    <!-- Front document -->
+    <rect x="0" y="0" width="48" height="64" rx="4" fill="url(#docGradient)" stroke="#64748B" stroke-width="1"/>
+    
+    <!-- Document lines representing content -->
+    <line x1="6" y1="12" x2="42" y2="12" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="20" x2="36" y2="20" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="28" x2="40" y2="28" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="36" x2="32" y2="36" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+    <line x1="6" y1="44" x2="38" y2="44" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Workflow arrow indicating process flow -->
+  <g transform="translate(75, 35)">
+    <path d="M0 10 L20 10 L15 5 M20 10 L15 15" stroke="#F59E0B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M0 25 L20 25 L15 20 M20 25 L15 30" stroke="#F59E0B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M0 40 L20 40 L15 35 M20 40 L15 45" stroke="#F59E0B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Progress indicator at bottom -->
+  <g transform="translate(25, 95)">
+    <rect x="0" y="0" width="78" height="8" rx="4" fill="#E5E7EB"/>
+    <rect x="0" y="0" width="52" height="8" rx="4" fill="url(#progressGradient)"/>
+    <!-- Progress percentage indicator -->
+    <circle cx="52" cy="4" r="6" fill="#10B981" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+  
+  <!-- Small checkmark in progress circle -->
+  <g transform="translate(46, -2)">
+    <path d="M3 4 L5 6 L9 2" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Subtle MCP connection dots -->
+  <g opacity="0.4">
+    <circle cx="25" cy="25" r="2" fill="#FFFFFF"/>
+    <circle cx="103" cy="25" r="2" fill="#FFFFFF"/>
+    <circle cx="25" cy="103" r="2" fill="#FFFFFF"/>
+    <circle cx="103" cy="103" r="2" fill="#FFFFFF"/>
+    <line x1="25" y1="25" x2="103" y2="25" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="2,2"/>
+    <line x1="25" y1="103" x2="103" y2="103" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="2,2"/>
+    <line x1="25" y1="25" x2="25" y2="103" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="2,2"/>
+    <line x1="103" y1="25" x2="103" y2="103" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="2,2"/>
+  </g>
+</svg>

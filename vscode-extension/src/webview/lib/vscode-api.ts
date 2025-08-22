@@ -24,6 +24,7 @@ export type ExtensionMessage =
   | { type: 'config-updated'; data: SoundNotificationConfig }
   | { type: 'sound-uris-updated'; data: { [key: string]: string } }
   | { type: 'navigate-to-approvals'; data: { specName: string; approvalId: string } }
+  | { type: 'archived-specs-updated'; data: SpecData[] }
   | { type: 'error'; message: string }
   | { type: 'notification'; message: string; level: 'info' | 'warning' | 'error' | 'success' };
 
@@ -45,7 +46,11 @@ export type WebviewMessage =
   | { type: 'get-selected-spec' }
   | { type: 'set-selected-spec'; specName: string }
   | { type: 'get-config' }
-  | { type: 'refresh-all' };
+  | { type: 'refresh-all' }
+  | { type: 'get-archived-specs' }
+  | { type: 'archive-spec'; specName: string }
+  | { type: 'unarchive-spec'; specName: string }
+  | { type: 'open-external-url'; url: string };
 
 export type TaskStatus = 'pending' | 'in-progress' | 'completed';
 
@@ -55,6 +60,7 @@ export interface SpecData {
   description?: string;
   createdAt: string;
   lastModified: string;
+  isArchived?: boolean;
   phases: {
     requirements: PhaseStatus;
     design: PhaseStatus;
@@ -95,6 +101,7 @@ export interface TaskInfo {
   requirements?: string[];
   leverage?: string;
   purposes?: string[];
+  inProgress?: boolean; // For backward compatibility
 }
 
 export interface ApprovalComment {
@@ -283,6 +290,23 @@ class VsCodeApiService {
 
   getConfig() {
     this.postMessage({ type: 'get-config' });
+  }
+
+  // Archive methods
+  getArchivedSpecs() {
+    this.postMessage({ type: 'get-archived-specs' });
+  }
+
+  archiveSpec(specName: string) {
+    this.postMessage({ type: 'archive-spec', specName });
+  }
+
+  unarchiveSpec(specName: string) {
+    this.postMessage({ type: 'unarchive-spec', specName });
+  }
+
+  openExternalUrl(url: string) {
+    this.postMessage({ type: 'open-external-url', url });
   }
 }
 

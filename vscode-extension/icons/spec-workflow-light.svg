@@ -1,0 +1,24 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- VSCode Activity Bar Icon - Monochrome design following official guidelines -->
+  
+  <!-- Document stack (3 documents representing spec workflow) -->
+  <g fill="currentColor">
+    <!-- Back document -->
+    <rect x="3" y="5" width="12" height="16" rx="2" fill="currentColor" opacity="0.3"/>
+    <!-- Middle document -->
+    <rect x="4" y="4" width="12" height="16" rx="2" fill="currentColor" opacity="0.6"/>
+    <!-- Front document -->
+    <rect x="5" y="3" width="12" height="16" rx="2" fill="currentColor"/>
+    
+    <!-- Document content lines -->
+    <rect x="7" y="7" width="8" height="1" rx="0.5" fill="#FFFFFF" mix-blend-mode="difference"/>
+    <rect x="7" y="9" width="6" height="1" rx="0.5" fill="#FFFFFF" mix-blend-mode="difference"/>
+    <rect x="7" y="11" width="7" height="1" rx="0.5" fill="#FFFFFF" mix-blend-mode="difference"/>
+    
+    <!-- Workflow arrow indicating process -->
+    <path d="M18 8 L21 11 L18 14" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Progress indicator dot -->
+    <circle cx="19.5" cy="17" r="1.5" fill="currentColor"/>
+  </g>
+</svg>

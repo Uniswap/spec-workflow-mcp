@@ -16,6 +16,7 @@ export interface SpecData {
     completed: number;
     pending: number;
   };
+  isArchived?: boolean;
 }
 
 export interface PhaseStatus {

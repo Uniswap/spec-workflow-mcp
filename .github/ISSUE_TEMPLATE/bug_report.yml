@@ -17,6 +17,18 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - MCP Server
+        - Web Dashboard
+        - VSCode Extension
+    validations:
+      required: true
+
   - type: textarea
     id: steps-to-reproduce
     attributes:
@@ -50,8 +62,8 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of the MCP server are you using?
-      placeholder: "1.0.0"
+      description: What version are you using? (MCP server, dashboard, or extension version)
+      placeholder: "0.0.19"
     validations:
       required: true
 

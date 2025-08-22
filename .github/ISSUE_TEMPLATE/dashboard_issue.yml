@@ -1,12 +1,23 @@
-name: 📊 Dashboard Issue
-description: Report an issue or request a feature for the dashboard
+name: 📊 Dashboard/Extension Issue
+description: Report an issue with the web dashboard or VSCode extension dashboard
 title: "[Dashboard]: "
 labels: ["dashboard", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Report issues with the web dashboard monitoring tool.
+        Report issues with the web dashboard or VSCode extension dashboard.
+
+  - type: dropdown
+    id: dashboard-type
+    attributes:
+      label: Dashboard Type
+      description: Which dashboard are you using?
+      options:
+        - "Web Dashboard"
+        - "VSCode Extension Dashboard"
+    validations:
+      required: true
 
   - type: dropdown
     id: issue-type
@@ -48,9 +59,9 @@ body:
     id: command-used
     attributes:
       label: Command or Setup Used
-      description: How did you start the MCP server or dashboard?
+      description: How did you start the MCP server/dashboard or what VSCode version are you using?
       render: shell
-      placeholder: npm start
+      placeholder: npx @pimzino/spec-workflow-mcp@latest --dashboard
 
   - type: textarea
     id: additional-context

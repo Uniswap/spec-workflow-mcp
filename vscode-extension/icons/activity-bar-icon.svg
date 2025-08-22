@@ -1,0 +1,28 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- VSCode Activity Bar Icon - Single color, simple design -->
+  
+  <!-- Document stack representing specs (Requirements, Design, Tasks) -->
+  <g>
+    <!-- Back documents (shadow effect) -->
+    <rect x="4" y="5" width="11" height="15" rx="1.5" fill="currentColor" opacity="0.25"/>
+    <rect x="5" y="4" width="11" height="15" rx="1.5" fill="currentColor" opacity="0.5"/>
+    
+    <!-- Front document -->
+    <rect x="6" y="3" width="11" height="15" rx="1.5" fill="currentColor"/>
+    
+    <!-- Document content lines (white knockout) -->
+    <rect x="8" y="7" width="7" height="1" rx="0.5" fill="white" opacity="0.8"/>
+    <rect x="8" y="9" width="5" height="1" rx="0.5" fill="white" opacity="0.6"/>
+    <rect x="8" y="11" width="6" height="1" rx="0.5" fill="white" opacity="0.6"/>
+    <rect x="8" y="13" width="4" height="1" rx="0.5" fill="white" opacity="0.4"/>
+  </g>
+  
+  <!-- Workflow process arrow -->
+  <g>
+    <path d="M18 9 L20.5 11.5 L18 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Progress/completion indicator -->
+  <circle cx="20" cy="18" r="2" fill="currentColor" opacity="0.8"/>
+  <circle cx="20" cy="18" r="1" fill="white"/>
+</svg>
