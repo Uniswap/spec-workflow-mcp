@@ -96,7 +96,10 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
+         "env": {
+            "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
+          }
        }
      }
    }
@@ -110,7 +113,10 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
+         "env": {
+            "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
+          }
        }
      }
    }
@@ -122,7 +128,10 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"]
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"],
+         "env": {
+            "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
+          }
        }
      }
    }
