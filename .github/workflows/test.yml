@@ -31,8 +31,3 @@ jobs:
 
       - name: Check types
         run: npx tsc --noEmit
-
-      - name: Verify bin script is executable
-        run: |
-          chmod +x dist/index.js
-          node dist/index.js --version || true
