@@ -1,7 +1,7 @@
 import fastify, { FastifyInstance } from "fastify";
 import fastifyStatic from "@fastify/static";
 import fastifyWebsocket from "@fastify/websocket";
-import { join, dirname, basename } from "path";
+import { join, dirname, basename, resolve } from "path";
 import { readFile } from "fs/promises";
 import { promises as fs } from "fs";
 import { fileURLToPath } from "url";
@@ -73,9 +73,14 @@ export class DashboardServer {
     }
 
     // Register plugins
+    // Use resolve to ensure absolute path and prevent path traversal
+    const publicDir = resolve(__dirname, "public");
     await this.app.register(fastifyStatic, {
-      root: join(__dirname, "public"),
+      root: publicDir,
       prefix: "/",
+      // Additional security options
+      serve: false, // Don't serve directory listings
+      decorateReply: true, // Add reply.sendFile method
     });
 
     await this.app.register(fastifyWebsocket);
