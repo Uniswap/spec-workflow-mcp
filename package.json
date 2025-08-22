@@ -20,7 +20,10 @@
     "dev:dashboard": "node scripts/dev-dashboard.mjs",
     "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts",
     "clean": "rimraf dist",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish"
   },
   "keywords": [
     "mcp",
