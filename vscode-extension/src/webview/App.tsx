@@ -13,7 +13,8 @@ import {
   BookOpen,
   Settings,
   Copy,
-  ChevronUp
+  ChevronUp,
+  Coffee
 } from 'lucide-react';
 import { vscodeApi, type SpecData, type TaskProgressData, type ApprovalData, type SteeringStatus, type DocumentInfo, type SoundNotificationConfig } from '@/lib/vscode-api';
 import { cn, formatDistanceToNow } from '@/lib/utils';
@@ -25,6 +26,7 @@ function App() {
   const theme = useVSCodeTheme();
   console.log('Current VS Code theme:', theme);
   const [specs, setSpecs] = useState<SpecData[]>([]);
+  const [archivedSpecs, setArchivedSpecs] = useState<SpecData[]>([]);
   const [selectedSpec, setSelectedSpec] = useState<string | null>(null);
   const [taskData, setTaskData] = useState<TaskProgressData | null>(null);
   const [approvals, setApprovals] = useState<ApprovalData[]>([]);
@@ -44,6 +46,8 @@ function App() {
     taskCompletionSound: true
   });
   const [soundUris, setSoundUris] = useState<{ [key: string]: string } | null>(null);
+  const [archiveView, setArchiveView] = useState<'active' | 'archived'>('active');
+  const [selectedArchivedSpec, setSelectedArchivedSpec] = useState<string | null>(null);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   
   // Sound notifications - use config from VS Code settings
@@ -143,6 +147,11 @@ function App() {
         }
       }),
       vscodeApi.onMessage('approvals-updated', (message: any) => {
+        console.log('=== Received approvals-updated message ===');
+        console.log('Current tab:', activeTab);
+        console.log('Approvals count:', message.data?.length || 0);
+        console.log('Pending approvals:', message.data?.filter((a: any) => a.status === 'pending').length || 0);
+        console.log('About to setApprovals - this should trigger badge counter update');
         setApprovals(message.data || []);
       }),
       vscodeApi.onMessage('steering-updated', (message: any) => {
@@ -180,7 +189,7 @@ function App() {
       }),
       vscodeApi.onMessage('navigate-to-approvals', (message: any) => {
         console.log('Navigating to approvals from native notification:', message.data);
-        const { specName, approvalId } = message.data;
+        const { specName, approvalId: _approvalId } = message.data;
         
         // Switch to approvals tab
         setActiveTab('approvals');
@@ -190,10 +199,17 @@ function App() {
         
         console.log('Switched to approvals tab, selected spec:', specName);
       }),
+      vscodeApi.onMessage('archived-specs-updated', (message: any) => {
+        console.log('=== Received archived-specs-updated message ===');
+        console.log('Archived specs count:', message.data?.length || 0);
+        setArchivedSpecs(message.data || []);
+      }),
     ];
 
     // Initial data load
     handleRefresh();
+    // Explicitly get approvals for badge counter
+    vscodeApi.getApprovals();
 
     return () => {
       unsubscribes.forEach(unsub => unsub());
@@ -206,6 +222,12 @@ function App() {
       vscodeApi.getSpecDocuments(selectedSpec);
     }
   }, [selectedSpec]);
+
+  useEffect(() => {
+    if (selectedArchivedSpec) {
+      vscodeApi.getSpecDocuments(selectedArchivedSpec);
+    }
+  }, [selectedArchivedSpec]);
 
   useEffect(() => {
     // Load steering documents on initial load
@@ -276,16 +298,27 @@ function App() {
     previousTaskData.current = taskData;
   }, [taskData, soundNotifications, soundConfig.taskCompletionSound]);
 
+  // Fetch fresh data when switching tabs
+  useEffect(() => {
+    if (activeTab === 'approvals') {
+      vscodeApi.getApprovals();
+    } else if (activeTab === 'archives') {
+      vscodeApi.getArchivedSpecs();
+    }
+  }, [activeTab]);
+
   const handleRefresh = () => {
     setLoading(true);
     vscodeApi.refreshAll();
     vscodeApi.getSelectedSpec();
     vscodeApi.getConfig();
+    vscodeApi.getArchivedSpecs();
   };
 
   const handleSpecSelect = (specName: string) => {
     vscodeApi.setSelectedSpec(specName);
   };
+
 
 
   const handleTaskStatusUpdate = (taskId: string, status: 'pending' | 'in-progress' | 'completed') => {
@@ -296,15 +329,32 @@ function App() {
 
   // Calculate overall project statistics
   const projectStats = React.useMemo(() => {
-    const totalSpecs = specs.length;
+    const activeSpecs = specs.filter(spec => !spec.isArchived).length;
+    const archivedSpecsCount = archivedSpecs.length;
+    const totalSpecs = activeSpecs + archivedSpecsCount;
+    
     const completedSpecs = specs.filter(spec => 
       spec.taskProgress && spec.taskProgress.completed === spec.taskProgress.total && spec.taskProgress.total > 0
     ).length;
     const totalTasks = specs.reduce((sum, spec) => sum + (spec.taskProgress?.total || 0), 0);
     const completedTasks = specs.reduce((sum, spec) => sum + (spec.taskProgress?.completed || 0), 0);
     
-    return { totalSpecs, completedSpecs, totalTasks, completedTasks };
-  }, [specs]);
+    return { 
+      activeSpecs, 
+      archivedSpecs: archivedSpecsCount, 
+      totalSpecs, 
+      completedSpecs, 
+      totalTasks, 
+      completedTasks 
+    };
+  }, [specs, archivedSpecs]);
+
+  // Calculate pending approvals count
+  const pendingApprovalsCount = React.useMemo(() => {
+    const count = approvals.filter(approval => approval.status === 'pending').length;
+    console.log('Badge counter recalculated:', count, 'from', approvals.length, 'total approvals');
+    return count;
+  }, [approvals]);
 
   return (
     <div className={cn("sidebar-root", `vscode-${theme}`)}>
@@ -335,33 +385,52 @@ function App() {
 
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold">Spec Workflow</h1>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={loading}
-            >
-              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-            </Button>
+            <h1 className="text-lg font-semibold">Spec Workflow MCP</h1>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => vscodeApi.openExternalUrl('https://buymeacoffee.com/pimzino')}
+                title="Support this project"
+                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+              >
+                <Coffee className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={loading}
+              >
+                <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+              </Button>
+            </div>
           </div>
 
           {/* Navigation Tabs */}
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview" className="text-xs">
+            <TabsTrigger value="overview" className="text-xs" title="Project Overview">
               <Activity className="h-3 w-3" />
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="text-xs">
-              <CheckSquare className="h-3 w-3" />
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="text-xs">
-              <BookOpen className="h-3 w-3" />
-            </TabsTrigger>
-            <TabsTrigger value="steering" className="text-xs">
+            <TabsTrigger value="steering" className="text-xs" title="Steering Documents">
               <Settings className="h-3 w-3" />
             </TabsTrigger>
-            <TabsTrigger value="approvals" className="text-xs">
+            <TabsTrigger value="specs" className="text-xs" title="Specification Documents">
+              <BookOpen className="h-3 w-3" />
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="text-xs" title="Task Management">
+              <CheckSquare className="h-3 w-3" />
+            </TabsTrigger>
+            <TabsTrigger value="approvals" className="text-xs relative" title="Approval Requests">
               <AlertCircle className="h-3 w-3" />
+              {pendingApprovalsCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center rounded-full min-w-[16px]"
+                >
+                  {pendingApprovalsCount}
+                </Badge>
+              )}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -378,9 +447,24 @@ function App() {
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="space-y-1">
-                  <div className="text-muted-foreground">Specs</div>
+                  <div className="text-muted-foreground">Active Specs</div>
                   <div className="font-medium">
-                    {projectStats.completedSpecs} / {projectStats.totalSpecs}
+                    {projectStats.completedSpecs} / {projectStats.activeSpecs}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-muted-foreground">Archived Specs</div>
+                  <div className="font-medium">
+                    {projectStats.archivedSpecs}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="space-y-1">
+                  <div className="text-muted-foreground">Total Specs</div>
+                  <div className="font-medium">
+                    {projectStats.totalSpecs}
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -462,33 +546,29 @@ function App() {
           {selectedSpec ? (
             taskData ? (
               <>
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="font-medium text-lg">{taskData.total}</div>
-                      <div className="text-muted-foreground text-xs">Total</div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="font-medium text-lg text-green-600">{taskData.completed}</div>
-                      <div className="text-muted-foreground text-xs">Done</div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="font-medium text-lg text-amber-600">{taskData.total - taskData.completed}</div>
-                      <div className="text-muted-foreground text-xs">Left</div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-3 text-center">
-                      <div className="font-medium text-lg text-blue-600">{Math.round(taskData.progress)}%</div>
-                      <div className="text-muted-foreground text-xs">Progress</div>
-                    </CardContent>
-                  </Card>
-                </div>
+                {/* Stats Card */}
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-4 gap-6">
+                      <div className="text-center">
+                        <div className="font-medium text-lg">{taskData.total}</div>
+                        <div className="text-muted-foreground text-xs">Total</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-medium text-lg text-green-600">{taskData.completed}</div>
+                        <div className="text-muted-foreground text-xs">Done</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-medium text-lg text-amber-600">{taskData.total - taskData.completed}</div>
+                        <div className="text-muted-foreground text-xs">Left</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-medium text-lg text-blue-600">{Math.round(taskData.progress)}%</div>
+                        <div className="text-muted-foreground text-xs">Progress</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* Progress Bar */}
                 <Card>
@@ -503,11 +583,23 @@ function App() {
 
                 {/* Task List */}
                 <div className="space-y-2">
-                  {taskData.taskList?.map(task => (
+                  {taskData.taskList?.map(task => {
+                    // DEBUG: Log actual task properties
+                    console.log(`🔍 TASK DEBUG [${task.id}]:`, {
+                      id: task.id,
+                      status: task.status,
+                      completed: task.completed,
+                      inProgress: task.inProgress,
+                      hasInProgress: 'inProgress' in task,
+                      allProps: Object.keys(task)
+                    });
+                    
+                    return (
                     <Card key={task.id} className={cn(
                       "transition-colors",
                       task.isHeader && "border-purple-200 dark:border-slate-600 bg-purple-50 dark:bg-slate-800/60",
-                      taskData.inProgress === task.id && "border-orange-500 bg-orange-50 dark:bg-orange-950/20"
+                      task.status === 'in-progress' && "border-orange-500",
+                      task.completed && "border-green-500"
                     )}>
                       <CardContent className="p-3">
                         <div className="space-y-2">
@@ -539,7 +631,7 @@ function App() {
                                   <Copy className="h-3 w-3" />
                                 </Button>
                                 <Select 
-                                  value={task.completed ? 'completed' : task.status} 
+                                  value={task.completed ? 'completed' : (task.status || 'pending')} 
                                   onValueChange={(status: 'pending' | 'in-progress' | 'completed') => 
                                     handleTaskStatusUpdate(task.id, status)
                                   }
@@ -547,10 +639,10 @@ function App() {
                                   <SelectTrigger className={cn(
                                     "w-auto h-6 px-2 text-xs border-0 focus:ring-0 focus:ring-offset-0",
                                     task.completed 
-                                      ? "bg-primary text-primary-foreground" 
-                                      : task.status === 'in-progress' 
-                                        ? "bg-secondary text-secondary-foreground" 
-                                        : "bg-transparent border border-border text-foreground"
+                                      ? "bg-green-500 text-white [&_svg]:!text-white [&_svg]:opacity-100" 
+                                      : task.status === 'in-progress'
+                                        ? "bg-orange-500 text-white [&_svg]:!text-white [&_svg]:opacity-100" 
+                                        : "bg-transparent border border-border text-foreground [&_svg]:text-foreground"
                                   )}>
                                     <SelectValue />
                                   </SelectTrigger>
@@ -587,12 +679,14 @@ function App() {
                                 <div className="text-xs font-medium text-purple-600 dark:text-purple-400 flex items-center gap-1">
                                   Files:
                                 </div>
-                                <div className="flex flex-wrap gap-1">
-                                  {task.files.map((file, index) => (
-                                    <span key={index} className="px-2 py-1 bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 text-xs rounded border border-purple-200 dark:border-purple-800 font-mono">
-                                      {file}
-                                    </span>
-                                  ))}
+                                <div className="task-files-container">
+                                  <div className="task-files-list">
+                                    {task.files.map((file, index) => (
+                                      <span key={index} className="px-2 py-1 bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 text-xs rounded border border-purple-200 dark:border-purple-800 font-mono whitespace-nowrap flex-shrink-0">
+                                        {file}
+                                      </span>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             )}
@@ -652,7 +746,8 @@ function App() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               </>
             ) : (
@@ -677,11 +772,27 @@ function App() {
                   <SelectValue placeholder="Select a specification" />
                 </SelectTrigger>
                 <SelectContent>
-                  {specs.map(spec => (
-                    <SelectItem key={spec.name} value={spec.name}>
-                      {spec.displayName}
-                    </SelectItem>
-                  ))}
+                  {specs.map(spec => {
+                    const specPendingCount = approvals.filter(approval => 
+                      approval.status === 'pending' && approval.categoryName === spec.name
+                    ).length;
+                    
+                    return (
+                      <SelectItem key={spec.name} value={spec.name}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{spec.displayName}</span>
+                          {specPendingCount > 0 && (
+                            <Badge 
+                              variant="secondary" 
+                              className="ml-2 h-4 w-4 p-0 text-xs flex items-center justify-center rounded-full min-w-[16px]"
+                            >
+                              {specPendingCount}
+                            </Badge>
+                          )}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -786,23 +897,94 @@ function App() {
           )}
         </TabsContent>
 
-        {/* Documents Tab */}
-        <TabsContent value="documents" className="space-y-3">
+        {/* Specs Tab */}
+        <TabsContent value="specs" className="space-y-3">
           <div className="space-y-3">
+            {/* Sub-navigation for Active/Archived */}
+            <div className="flex items-center justify-center">
+              <div className="inline-flex items-center space-x-1 p-1 bg-muted rounded-md">
+                <Button
+                  variant={archiveView === 'active' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={cn(
+                    "h-7 px-3 text-xs font-medium transition-all",
+                    archiveView === 'active' 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "hover:bg-muted-foreground/10"
+                  )}
+                  onClick={() => {
+                    setArchiveView('active');
+                    setSelectedArchivedSpec(null);
+                  }}
+                >
+                  Active
+                </Button>
+                <Button
+                  variant={archiveView === 'archived' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={cn(
+                    "h-7 px-3 text-xs font-medium transition-all",
+                    archiveView === 'archived' 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "hover:bg-muted-foreground/10"
+                  )}
+                  onClick={() => {
+                    setArchiveView('archived');
+                    setSelectedSpec(null);
+                  }}
+                >
+                  Archived
+                </Button>
+              </div>
+            </div>
+
             <div className="flex items-center space-x-2">
               <label className="text-sm font-medium">Specification:</label>
-              <Select value={selectedSpec || ''} onValueChange={handleSpecSelect}>
+              <Select 
+                value={archiveView === 'active' ? (selectedSpec || '') : (selectedArchivedSpec || '')} 
+                onValueChange={archiveView === 'active' ? handleSpecSelect : setSelectedArchivedSpec}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a specification" />
                 </SelectTrigger>
                 <SelectContent>
-                  {specs.map(spec => (
-                    <SelectItem key={spec.name} value={spec.name}>
-                      {spec.displayName}
-                    </SelectItem>
-                  ))}
+                  {archiveView === 'active' 
+                    ? specs.filter(spec => !spec.isArchived).map(spec => (
+                        <SelectItem key={spec.name} value={spec.name}>
+                          {spec.displayName}
+                        </SelectItem>
+                      ))
+                    : archivedSpecs.map(spec => (
+                        <SelectItem key={spec.name} value={spec.name}>
+                          {spec.displayName}
+                        </SelectItem>
+                      ))
+                  }
                 </SelectContent>
               </Select>
+              
+              {/* Context-appropriate action button */}
+              {archiveView === 'active' && selectedSpec && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 text-xs whitespace-nowrap"
+                  onClick={() => vscodeApi.archiveSpec(selectedSpec)}
+                >
+                  Archive
+                </Button>
+              )}
+              
+              {archiveView === 'archived' && selectedArchivedSpec && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 text-xs whitespace-nowrap"
+                  onClick={() => vscodeApi.unarchiveSpec(selectedArchivedSpec)}
+                >
+                  Unarchive
+                </Button>
+              )}
             </div>
           </div>
 
@@ -811,13 +993,13 @@ function App() {
               <CardTitle className="text-sm">Specification Documents</CardTitle>
             </CardHeader>
             <CardContent>
-              {selectedSpec && (
+              {(archiveView === 'active' ? selectedSpec : selectedArchivedSpec) && (
                 <div className="space-y-2">
                   {specDocuments.length > 0 ? (
                     specDocuments.map((doc) => (
                       <div key={doc.name} className="flex items-center justify-between p-2 border rounded">
                         <div className="flex-1 space-y-1">
-                          <div className="font-medium text-sm capitalize">{doc.name}.md</div>
+                          <div className="font-medium text-sm"><span className="capitalize">{doc.name}</span>.md</div>
                           {doc.exists && doc.lastModified && (
                             <div className="text-xs text-muted-foreground">
                               Modified {formatDistanceToNow(doc.lastModified)}
@@ -833,7 +1015,10 @@ function App() {
                           size="sm"
                           className="h-6 px-2 text-xs"
                           disabled={!doc.exists}
-                          onClick={() => vscodeApi.openDocument(selectedSpec, doc.name)}
+                          onClick={() => vscodeApi.openDocument(
+                            archiveView === 'active' ? selectedSpec! : selectedArchivedSpec!, 
+                            doc.name
+                          )}
                         >
                           Open
                         </Button>
@@ -846,9 +1031,12 @@ function App() {
                   )}
                 </div>
               )}
-              {!selectedSpec && (
+              {!(archiveView === 'active' ? selectedSpec : selectedArchivedSpec) && (
                 <div className="text-center text-muted-foreground text-sm py-8">
-                  {specs.length === 0 ? 'No specifications found' : 'Select a specification above to view documents'}
+                  {archiveView === 'active' 
+                    ? (specs.filter(spec => !spec.isArchived).length === 0 ? 'No active specifications found' : 'Select a specification above to view documents')
+                    : (archivedSpecs.length === 0 ? 'No archived specifications found' : 'Select a specification above to view documents')
+                  }
                 </div>
               )}
             </CardContent>
@@ -867,7 +1055,7 @@ function App() {
                   steeringDocuments.map((doc) => (
                     <div key={doc.name} className="flex items-center justify-between p-2 border rounded">
                       <div className="flex-1 space-y-1">
-                        <div className="font-medium text-sm capitalize">{doc.name}.md</div>
+                        <div className="font-medium text-sm"><span className="capitalize">{doc.name}</span>.md</div>
                         {doc.exists && doc.lastModified && (
                           <div className="text-xs text-muted-foreground">
                             Modified {formatDistanceToNow(doc.lastModified)}
@@ -898,6 +1086,7 @@ function App() {
             </CardContent>
           </Card>
         </TabsContent>
+
         </div>
 
         {/* Scroll to Top FAB */}

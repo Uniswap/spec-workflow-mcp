@@ -46,7 +46,7 @@ async function createConfig() {
       },
     },
     build: {
-      outDir: 'webview-dist',
+      outDir: path.resolve(__dirname, 'webview-dist'),
       rollupOptions: {
         input: {
           main: 'src/webview/index.html',

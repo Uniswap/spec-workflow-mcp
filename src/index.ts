@@ -4,6 +4,72 @@ import { SpecWorkflowMCPServer } from './server.js';
 import { DashboardServer } from './dashboard/server.js';
 import { homedir } from 'os';
 
+function showHelp() {
+  console.log(`
+Spec Workflow MCP Server - A Model Context Protocol server for spec-driven development
+
+USAGE:
+  spec-workflow-mcp [path] [options]
+
+ARGUMENTS:
+  path                    Project path (defaults to current directory)
+                         Supports ~ for home directory
+
+OPTIONS:
+  --help                  Show this help message
+  --dashboard             Run dashboard-only mode (no MCP server)
+  --AutoStartDashboard    Auto-start dashboard with MCP server
+  --port <number>         Specify dashboard port (1024-65535)
+                         Works with both --dashboard and --AutoStartDashboard
+                         If not specified, uses an ephemeral port
+
+MODES OF OPERATION:
+
+1. MCP Server Only (default):
+   spec-workflow-mcp
+   spec-workflow-mcp ~/my-project
+   
+   Starts MCP server without dashboard. Dashboard can be started separately.
+
+2. MCP Server with Auto-Started Dashboard:
+   spec-workflow-mcp --AutoStartDashboard
+   spec-workflow-mcp --AutoStartDashboard --port 3456
+   spec-workflow-mcp ~/my-project --AutoStartDashboard
+   
+   Starts MCP server and automatically launches dashboard in browser.
+   Note: Server and dashboard shut down when MCP client disconnects.
+
+3. Dashboard Only Mode:
+   spec-workflow-mcp --dashboard
+   spec-workflow-mcp --dashboard --port 3456
+   spec-workflow-mcp ~/my-project --dashboard
+   
+   Runs only the web dashboard without MCP server.
+
+EXAMPLES:
+  # Start MCP server in current directory (no dashboard)
+  spec-workflow-mcp
+
+  # Start MCP server with auto-started dashboard on ephemeral port
+  spec-workflow-mcp --AutoStartDashboard
+
+  # Start MCP server with dashboard on specific port
+  spec-workflow-mcp --AutoStartDashboard --port 8080
+
+  # Run dashboard only on port 3000
+  spec-workflow-mcp --dashboard --port 3000
+
+  # Start in a specific project directory
+  spec-workflow-mcp ~/projects/my-app --AutoStartDashboard
+
+PORT FORMATS:
+  --port 3456             Space-separated format
+  --port=3456             Equals format
+
+For more information, visit: https://github.com/Pimzino/spec-workflow-mcp
+`);
+}
+
 function expandTildePath(path: string): string {
   if (path.startsWith('~/') || path === '~') {
     return path.replace('~', homedir());
@@ -11,9 +77,30 @@ function expandTildePath(path: string): string {
   return path;
 }
 
-function parseArguments(args: string[]): { projectPath: string; isDashboardMode: boolean; port?: number } {
+function parseArguments(args: string[]): { 
+  projectPath: string; 
+  isDashboardMode: boolean; 
+  autoStartDashboard: boolean;
+  port?: number;
+} {
   const isDashboardMode = args.includes('--dashboard');
+  const autoStartDashboard = args.includes('--AutoStartDashboard');
   let customPort: number | undefined;
+  
+  // Check for invalid flags
+  const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--help', '-h'];
+  for (const arg of args) {
+    if (arg.startsWith('--') && !arg.includes('=')) {
+      if (!validFlags.includes(arg)) {
+        throw new Error(`Unknown option: ${arg}\nUse --help to see available options.`);
+      }
+    } else if (arg.startsWith('--') && arg.includes('=')) {
+      const flagName = arg.split('=')[0];
+      if (!validFlags.includes(flagName)) {
+        throw new Error(`Unknown option: ${flagName}\nUse --help to see available options.`);
+      }
+    }
+  }
   
   // Parse --port parameter (supports --port 3000 and --port=3000 formats)
   for (let i = 0; i < args.length; i++) {
@@ -54,6 +141,7 @@ function parseArguments(args: string[]): { projectPath: string; isDashboardMode:
   // Get project path (filter out flags and their values)
   const filteredArgs = args.filter((arg, index) => {
     if (arg === '--dashboard') return false;
+    if (arg === '--AutoStartDashboard') return false;
     if (arg.startsWith('--port=')) return false;
     if (arg === '--port') return false;
     // Check if this arg is a port value following --port
@@ -64,13 +152,20 @@ function parseArguments(args: string[]): { projectPath: string; isDashboardMode:
   const rawProjectPath = filteredArgs[0] || process.cwd();
   const projectPath = expandTildePath(rawProjectPath);
   
-  return { projectPath, isDashboardMode, port: customPort };
+  return { projectPath, isDashboardMode, autoStartDashboard, port: customPort };
 }
 
 async function main() {
   try {
     const args = process.argv.slice(2);
-    const { projectPath, isDashboardMode, port } = parseArguments(args);
+    
+    // Check for help flag
+    if (args.includes('--help') || args.includes('-h')) {
+      showHelp();
+      process.exit(0);
+    }
+    
+    const { projectPath, isDashboardMode, autoStartDashboard, port } = parseArguments(args);
     
     if (isDashboardMode) {
       // Dashboard only mode
@@ -103,12 +198,24 @@ async function main() {
       process.stdin.resume();
       
     } else {
-      // MCP server only mode
+      // MCP server mode (with optional auto-start dashboard)
       const server = new SpecWorkflowMCPServer();
-      await server.initialize(projectPath, false);
+      
+      // Initialize with dashboard options
+      const dashboardOptions = autoStartDashboard ? {
+        autoStart: true,
+        port: port
+      } : undefined;
+      
+      await server.initialize(projectPath, dashboardOptions);
       
       // Start monitoring for dashboard session
       server.startDashboardMonitoring();
+      
+      // Inform user about MCP server lifecycle
+      if (autoStartDashboard) {
+        console.log('\nMCP server is running. The server and dashboard will shut down when the MCP client disconnects.');
+      }
       
       // Handle graceful shutdown
       process.on('SIGINT', async () => {

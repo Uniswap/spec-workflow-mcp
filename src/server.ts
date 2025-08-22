@@ -14,6 +14,11 @@ import { validateProjectPath } from './core/path-utils.js';
 import { DashboardServer } from './dashboard/server.js';
 import { SessionManager } from './core/session-manager.js';
 
+export interface DashboardStartOptions {
+  autoStart: boolean;
+  port?: number;
+}
+
 export class SpecWorkflowMCPServer {
   private server: Server;
   private projectPath!: string;
@@ -61,7 +66,7 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
     });
   }
 
-  async initialize(projectPath: string, startDashboard: boolean = true) {
+  async initialize(projectPath: string, dashboardOptions?: DashboardStartOptions) {
     this.projectPath = projectPath;
     try {
       // Validate project path
@@ -71,15 +76,19 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
       this.sessionManager = new SessionManager(this.projectPath);
       
       // Start dashboard if requested
-      if (startDashboard) {
+      if (dashboardOptions?.autoStart) {
         this.dashboardServer = new DashboardServer({
           projectPath: this.projectPath,
-          autoOpen: true
+          autoOpen: true,  // Auto-open browser when dashboard is auto-started
+          port: dashboardOptions.port
         });
         this.dashboardUrl = await this.dashboardServer.start();
         
         // Create session tracking (overwrites any existing session.json)
         await this.sessionManager.createSession(this.dashboardUrl);
+        
+        // Log dashboard startup info
+        console.log(`Dashboard auto-started at: ${this.dashboardUrl}`);
       }
       
       // Create context for tools
@@ -94,7 +103,27 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
       
       // Connect to stdio transport
       const transport = new StdioServerTransport();
+      
+      // Handle client disconnection - exit gracefully when transport closes
+      transport.onclose = async () => {
+        await this.stop();
+        process.exit(0);
+      };
+      
       await this.server.connect(transport);
+      
+      // Monitor stdin for client disconnection (additional safety net)
+      process.stdin.on('end', async () => {
+        await this.stop();
+        process.exit(0);
+      });
+      
+      // Handle stdin errors
+      process.stdin.on('error', async (error) => {
+        console.error('stdin error:', error);
+        await this.stop();
+        process.exit(1);
+      });
       
       // MCP server initialized successfully
       
@@ -193,18 +222,25 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
   }
 
   async stop() {
-    // Stop dashboard monitoring
-    if (this.dashboardMonitoringInterval) {
-      clearInterval(this.dashboardMonitoringInterval);
+    try {
+      // Stop dashboard monitoring
+      if (this.dashboardMonitoringInterval) {
+        clearInterval(this.dashboardMonitoringInterval);
+        this.dashboardMonitoringInterval = undefined;
+      }
+      
+      // Stop dashboard
+      if (this.dashboardServer) {
+        await this.dashboardServer.stop();
+        this.dashboardServer = undefined;
+      }
+      
+      // Stop MCP server
+      await this.server.close();
+    } catch (error) {
+      console.error('Error during shutdown:', error);
+      // Continue with shutdown even if there are errors
     }
-    
-    // Stop dashboard
-    if (this.dashboardServer) {
-      await this.dashboardServer.stop();
-    }
-    
-    // Stop MCP server
-    await this.server.close();
   }
   
   getDashboardUrl(): string | undefined {

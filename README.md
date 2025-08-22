@@ -1,8 +1,9 @@
 # Spec Workflow MCP
 
 [![GitHub Package](https://img.shields.io/badge/GitHub%20Package-@uniswap%2Fspec--workflow--mcp-blue)](https://github.com/uniswap/spec-workflow-mcp/packages)
+[![VSCode Extension](https://badgen.net/vs-marketplace/v/Pimzino.spec-workflow-mcp)](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)
 
-A Model Context Protocol (MCP) server that provides structured spec-driven development workflow tools for AI-assisted software development, featuring a real-time web dashboard for monitoring and managing your project's progress.
+A Model Context Protocol (MCP) server that provides structured spec-driven development workflow tools for AI-assisted software development, featuring a real-time web dashboard and VSCode extension for monitoring and managing your project's progress directly in your development environment.
 
 > **Note:** This package is published to GitHub Packages. See [Installation](#installation) for setup instructions.
 
@@ -73,9 +74,13 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
 
 - **Structured Development Workflow** - Sequential spec creation (Requirements → Design → Tasks)
 - **Real-Time Web Dashboard** - Monitor specs, tasks, and progress with live updates
-- **Document Management** - View and manage all spec documents from the dashboard
+- **VSCode Extension** - Integrated sidebar dashboard for developers working in VSCode
+- **Document Management** - View and manage all spec documents from dashboard or extension
+- **Archive System** - Organize completed specs to keep active projects clean
 - **Task Progress Tracking** - Visual progress bars and detailed task status
+- **Approval Workflow** - Complete approval process with approve, reject, and revision requests
 - **Steering Documents** - Project vision, technical decisions, and structure guidance
+- **Sound Notifications** - Configurable audio alerts for approvals and task completions
 - **Bug Workflow** - Complete bug reporting and resolution tracking
 - **Template System** - Pre-built templates for all document types
 - **Cross-Platform** - Works on Windows, macOS, and Linux
@@ -98,31 +103,68 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
    ```
 
    **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
-
-2. **Start the web dashboard** (**REQUIRED**):
-
-   ```bash
-   # Default (uses ephemeral port)
-   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
-
-   # Custom port
-   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
-
-   # Alternative syntax
-   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port=8080
+   
+   **With Auto-Started Dashboard** (opens dashboard automatically with MCP server):
+   ```json
+   {
+     "mcpServers": {
+       "spec-workflow": {
+         "command": "npx",
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+       }
+     }
+   }
+   ```
+   
+   **With Custom Port**:
+   ```json
+   {
+     "mcpServers": {
+       "spec-workflow": {
+         "command": "npx",
+         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"]
+       }
+     }
+   }
    ```
 
-   **Options:**
-   - `--dashboard` - Start the web dashboard (required)
-   - `--port <number>` - Optional custom port (1024-65535). If not specified, an ephemeral port will be used
-
-   **IMPORTANT:** The dashboard is mandatory for the workflow to function. Without it:
-   - Document approvals won't work
-   - Task progress tracking will be disabled
-   - Spec status updates won't be available
-   - The approval system will be non-functional
-
-**Note:** The MCP server and dashboard are now separate services. You must run both: the MCP server for AI tool integration AND the dashboard for workflow management, approvals, and progress tracking.
+2. **Choose your interface**:
+   
+   ### Option A: Web Dashboard (**REQUIRED for CLI users**)
+   ```bash
+   # Dashboard only mode (uses ephemeral port)
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
+   
+   # Dashboard only with custom port
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
+   
+   # View all available options
+   npx -y @uniswap/spec-workflow-mcp@latest --help
+   ```
+   
+   **Command-Line Options:**
+   - `--help` - Show comprehensive usage information and examples
+   - `--dashboard` - Run dashboard-only mode (no MCP server)
+   - `--AutoStartDashboard` - Auto-start dashboard with MCP server
+   - `--port <number>` - Specify dashboard port (1024-65535). Works with both `--dashboard` and `--AutoStartDashboard`
+   
+   ### Option B: VSCode Extension (**Recommended for VSCode users**)
+   
+   Install the **[Spec Workflow MCP Extension](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)** from the VSCode marketplace:
+   
+   1. Open VSCode in your project directory containing `.spec-workflow/`
+   2. The extension automatically provides the dashboard functionality within VSCode
+   3. Access via the Spec Workflow icon in the Activity Bar
+   4. **No separate dashboard needed** - everything runs within your IDE
+   
+   **Extension Features:**
+   - Integrated sidebar dashboard with real-time updates
+   - Archive system for organizing completed specs
+   - Full approval workflow with VSCode native dialogs
+   - Sound notifications for approvals and completions
+   - Editor context menu actions for approvals and comments
+   
+   **IMPORTANT:** For CLI users, the web dashboard is mandatory. For VSCode users, the extension replaces the need for a separate web dashboard while providing the same functionality directly in your IDE.
 
 ## How to Use
 
@@ -195,6 +237,17 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+Or with auto-started dashboard:
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+    }
+  }
+}
+```
 </details>
 
 <details>
@@ -303,9 +356,11 @@ Add to your `opencode.json` configuration file (either global at `~/.config/open
 - `get-approval-status` - Check approval status
 - `delete-approval` - Clean up completed approvals
 
-## Web Dashboard
+## User Interfaces
 
-The dashboard is a separate service that must be started manually alongside the MCP server. Each project gets its own dedicated dashboard running on an ephemeral port. The dashboard provides:
+### Web Dashboard
+
+The web dashboard is a separate service for CLI users. Each project gets its own dedicated dashboard running on an ephemeral port. The dashboard provides:
 
 - **Live Project Overview** - Real-time updates of specs and progress
 - **Document Viewer** - Read requirements, design, and tasks documents
@@ -313,12 +368,29 @@ The dashboard is a separate service that must be started manually alongside the 
 - **Steering Documents** - Quick access to project guidance
 - **Dark Mode** - Automatically enabled for better readability
 
-### Dashboard Features
+#### Dashboard Features
 
 - **Spec Cards** - Overview of each spec with status indicators
 - **Document Navigation** - Switch between requirements, design, and tasks
 - **Task Management** - View task progress and copy implementation prompts
 - **Real-Time Updates** - WebSocket connection for live project status
+
+### VSCode Extension
+
+The VSCode extension provides all dashboard functionality directly within your IDE:
+
+- **Sidebar Integration** - Access everything from the Activity Bar
+- **Archive Management** - Switch between active and archived specs
+- **Native Dialogs** - VSCode confirmation dialogs for all actions
+- **Editor Integration** - Context menu actions for approvals and comments
+- **Sound Notifications** - Configurable audio alerts
+- **No External Dependencies** - Works entirely within VSCode
+
+#### Extension Advantages for VSCode Users
+- **Single Environment** - No need to switch between browser and IDE
+- **Native Experience** - Uses VSCode's native UI components
+- **Better Integration** - Context menu actions and editor integration
+- **Simplified Setup** - No separate dashboard service required
 
 ## Workflow Process
 

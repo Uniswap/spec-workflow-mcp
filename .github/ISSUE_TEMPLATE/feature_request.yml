@@ -43,7 +43,8 @@ body:
       description: Which area would this affect?
       options:
         - MCP Tools
-        - Dashboard
+        - Web Dashboard
+        - VSCode Extension
         - Spec Workflow
         - Bug Workflow
         - Templates

@@ -296,3 +296,38 @@ body.vscode-high-contrast {
     @apply bg-background text-foreground;
   }
 }
+
+/* Horizontal scrollable file paths */
+.task-files-container {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vscode-scrollbarSlider-background) transparent;
+  padding-bottom: 4px; /* Space for scrollbar */
+}
+
+/* Minimalistic horizontal scrollbar */
+.task-files-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.task-files-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-files-container::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background, rgba(0, 0, 0, 0.3));
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.task-files-container::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground, rgba(0, 0, 0, 0.5));
+}
+
+.task-files-list {
+  display: flex;
+  gap: 4px;
+  min-width: min-content;
+  width: max-content;
+}

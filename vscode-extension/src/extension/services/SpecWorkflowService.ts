@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { SpecData, TaskProgressData, TaskInfo, ApprovalData, SteeringStatus, PhaseStatus } from '../types';
 import { ApprovalEditorService } from './ApprovalEditorService';
+import { ArchiveService } from './ArchiveService';
 import { parseTasksFromMarkdown, updateTaskStatus } from '../utils/taskParser';
 import { Logger } from '../utils/logger';
 
@@ -16,16 +17,19 @@ export class SpecWorkflowService {
   private tasksDocWatcher: vscode.FileSystemWatcher | null = null;
   private steeringDocumentsWatcher: vscode.FileSystemWatcher | null = null;
   private specsWatcher: vscode.FileSystemWatcher | null = null;
+  private archiveWatcher: vscode.FileSystemWatcher | null = null;
   private onApprovalsChangedCallback: (() => void) | null = null;
   private onTasksChangedCallback: ((specName: string) => void) | null = null;
   private onSpecDocumentsChangedCallback: ((specName: string) => void) | null = null;
   private onSteeringDocumentsChangedCallback: (() => void) | null = null;
   private onSpecsChangedCallback: (() => void) | null = null;
   private approvalEditorService: ApprovalEditorService | null = null;
+  private archiveService: ArchiveService;
   private logger: Logger;
 
   constructor(outputChannel: vscode.OutputChannel) {
     this.logger = new Logger(outputChannel);
+    this.archiveService = new ArchiveService(this.logger);
     this.updateWorkspaceRoot();
 
     // Note: ApprovalEditorService will be initialized in extension.ts to avoid circular dependency
@@ -40,6 +44,7 @@ export class SpecWorkflowService {
       this.setupTasksDocWatcher();
       this.setupSteeringDocumentsWatcher();
       this.setupSpecsWatcher();
+      this.setupArchiveWatcher();
     });
 
     this.setupApprovalWatcher();
@@ -49,6 +54,7 @@ export class SpecWorkflowService {
     this.setupTasksDocWatcher();
     this.setupSteeringDocumentsWatcher();
     this.setupSpecsWatcher();
+    this.setupArchiveWatcher();
   }
 
   setOnApprovalsChanged(callback: () => void) {
@@ -330,6 +336,36 @@ export class SpecWorkflowService {
     this.specsWatcher.onDidDelete(handleSpecsChange);
   }
 
+  private setupArchiveWatcher() {
+    // Dispose existing watcher
+    if (this.archiveWatcher) {
+      this.archiveWatcher.dispose();
+      this.archiveWatcher = null;
+    }
+
+    if (!this.specWorkflowRoot) {
+      return;
+    }
+
+    const archivePattern = new vscode.RelativePattern(
+      path.join(this.specWorkflowRoot, 'archive', 'specs'),
+      '*'
+    );
+
+    this.archiveWatcher = vscode.workspace.createFileSystemWatcher(archivePattern);
+
+    const handleArchiveChange = () => {
+      // Archive changes should trigger specs list refresh to hide/show archived specs
+      if (this.onSpecsChangedCallback) {
+        this.logger.log('Archive directory changed');
+        this.onSpecsChangedCallback();
+      }
+    };
+
+    this.archiveWatcher.onDidCreate(handleArchiveChange);
+    this.archiveWatcher.onDidDelete(handleArchiveChange);
+  }
+
   private extractSpecNameFromDocumentPath(filePath: string): string | null {
     if (!this.specWorkflowRoot) {
       return null;
@@ -380,6 +416,9 @@ export class SpecWorkflowService {
     if (this.specsWatcher) {
       this.specsWatcher.dispose();
     }
+    if (this.archiveWatcher) {
+      this.archiveWatcher.dispose();
+    }
   }
 
   private updateWorkspaceRoot() {
@@ -387,6 +426,8 @@ export class SpecWorkflowService {
     if (workspaceFolders && workspaceFolders.length > 0) {
       this.workspaceRoot = workspaceFolders[0].uri.fsPath;
       this.specWorkflowRoot = path.join(this.workspaceRoot, '.spec-workflow');
+      // Update archive service with new workspace root
+      this.archiveService.setWorkspaceRoot(this.workspaceRoot);
     } else {
       this.workspaceRoot = null;
       this.specWorkflowRoot = null;
@@ -412,7 +453,15 @@ export class SpecWorkflowService {
     return this.ensureSpecWorkflowExists();
   }
 
+  /**
+   * Get all specifications - maintains backward compatibility
+   * @deprecated Use getAllActiveSpecs() for clarity
+   */
   async getAllSpecs(): Promise<SpecData[]> {
+    return this.getAllActiveSpecs();
+  }
+
+  async getAllActiveSpecs(): Promise<SpecData[]> {
     if (!await this.ensureSpecWorkflowExists()) {
       this.logger.log('SpecWorkflow: No .spec-workflow directory found');
       return [];
@@ -1025,23 +1074,18 @@ export class SpecWorkflowService {
     const documents = ['requirements', 'design', 'tasks'];
     const result = [];
 
+    // Check if the spec is archived
+    const isArchived = await this.archiveService.isSpecArchived(specName);
+    this.logger.log(`SpecWorkflow: Checking documents for spec '${specName}' (archived: ${isArchived})`);
+
     for (const docType of documents) {
-      // Try specs/ subdirectory first
-      let docPath = path.join(this.specWorkflowRoot!, 'specs', specName, `${docType}.md`);
+      let docPath: string;
       let found = false;
       
-      try {
-        const stat = await fs.stat(docPath);
-        result.push({
-          name: docType,
-          exists: true,
-          path: docPath,
-          lastModified: stat.mtime.toISOString()
-        });
-        found = true;
-      } catch {
-        // Try root directory structure
-        docPath = path.join(this.specWorkflowRoot!, specName, `${docType}.md`);
+      if (isArchived) {
+        // For archived specs, look in the archive directory first
+        docPath = path.join(this.specWorkflowRoot!, 'archive', 'specs', specName, `${docType}.md`);
+        
         try {
           const stat = await fs.stat(docPath);
           result.push({
@@ -1052,11 +1096,45 @@ export class SpecWorkflowService {
           });
           found = true;
         } catch {
+          // If not found in archive, mark as missing
           result.push({
             name: docType,
             exists: false,
             path: docPath
           });
+        }
+      } else {
+        // For active specs, try specs/ subdirectory first
+        docPath = path.join(this.specWorkflowRoot!, 'specs', specName, `${docType}.md`);
+        
+        try {
+          const stat = await fs.stat(docPath);
+          result.push({
+            name: docType,
+            exists: true,
+            path: docPath,
+            lastModified: stat.mtime.toISOString()
+          });
+          found = true;
+        } catch {
+          // Try root directory structure as fallback
+          docPath = path.join(this.specWorkflowRoot!, specName, `${docType}.md`);
+          try {
+            const stat = await fs.stat(docPath);
+            result.push({
+              name: docType,
+              exists: true,
+              path: docPath,
+              lastModified: stat.mtime.toISOString()
+            });
+            found = true;
+          } catch {
+            result.push({
+              name: docType,
+              exists: false,
+              path: docPath
+            });
+          }
         }
       }
       
@@ -1101,19 +1179,41 @@ export class SpecWorkflowService {
     const allowedDocTypes = ['requirements', 'design', 'tasks'];
     if (!allowedDocTypes.includes(docType)) {return null;}
     
-    // Try specs/ subdirectory first
-    let docPath = path.join(this.specWorkflowRoot, 'specs', specName, `${docType}.md`);
-    try {
-      await fs.access(docPath);
-      return docPath;
-    } catch {
-      // Try root directory structure
-      docPath = path.join(this.specWorkflowRoot, specName, `${docType}.md`);
+    // Check if the spec is archived
+    const isArchived = await this.archiveService.isSpecArchived(specName);
+    this.logger.log(`SpecWorkflow: Getting document path for '${specName}/${docType}' (archived: ${isArchived})`);
+    
+    let docPath: string;
+    
+    if (isArchived) {
+      // For archived specs, look in the archive directory
+      docPath = path.join(this.specWorkflowRoot, 'archive', 'specs', specName, `${docType}.md`);
       try {
         await fs.access(docPath);
+        this.logger.log(`SpecWorkflow: Found archived document at ${docPath}`);
         return docPath;
       } catch {
+        this.logger.log(`SpecWorkflow: Archived document not found at ${docPath}`);
         return null;
+      }
+    } else {
+      // For active specs, try specs/ subdirectory first
+      docPath = path.join(this.specWorkflowRoot, 'specs', specName, `${docType}.md`);
+      try {
+        await fs.access(docPath);
+        this.logger.log(`SpecWorkflow: Found active document at ${docPath}`);
+        return docPath;
+      } catch {
+        // Try root directory structure as fallback
+        docPath = path.join(this.specWorkflowRoot, specName, `${docType}.md`);
+        try {
+          await fs.access(docPath);
+          this.logger.log(`SpecWorkflow: Found active document at fallback path ${docPath}`);
+          return docPath;
+        } catch {
+          this.logger.log(`SpecWorkflow: Active document not found for '${specName}/${docType}'`);
+          return null;
+        }
       }
     }
   }
@@ -1123,6 +1223,123 @@ export class SpecWorkflowService {
     const allowedDocTypes = ['product', 'tech', 'structure'];
     if (!allowedDocTypes.includes(docType)) {return null;}
     return path.join(this.specWorkflowRoot, 'steering', `${docType}.md`);
+  }
+
+  // ========== ARCHIVE METHODS ==========
+
+  /**
+   * Get all archived specifications
+   */
+  async getAllArchivedSpecs(): Promise<SpecData[]> {
+    if (!await this.ensureSpecWorkflowExists()) {
+      this.logger.log('SpecWorkflow: No .spec-workflow directory found');
+      return [];
+    }
+
+    const specs: SpecData[] = [];
+    
+    try {
+      const archiveSpecsDir = path.join(this.specWorkflowRoot!, 'archive', 'specs');
+      this.logger.log('SpecWorkflow: Checking archived specs directory:', archiveSpecsDir);
+      
+      try {
+        await fs.access(archiveSpecsDir);
+        const entries = await fs.readdir(archiveSpecsDir, { withFileTypes: true });
+        const specDirs = entries.filter(entry => entry.isDirectory());
+        this.logger.log('SpecWorkflow: Found archived spec directories:', specDirs.map(d => d.name));
+        
+        for (const specDir of specDirs) {
+          try {
+            const specData = await this.parseSpecDirectory(path.join(archiveSpecsDir, specDir.name), specDir.name);
+            if (specData) {
+              // Mark as archived
+              specData.isArchived = true;
+              specs.push(specData);
+            }
+          } catch (error) {
+            this.logger.warn(`Failed to parse archived spec ${specDir.name}:`, error);
+          }
+        }
+      } catch {
+        this.logger.log('SpecWorkflow: No archived specs directory found');
+      }
+
+      this.logger.log(`SpecWorkflow: Found ${specs.length} archived specs`);
+      return specs.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+    } catch (error) {
+      this.logger.error('Error reading archived specs:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Archive a specification - blocks if pending approvals exist
+   */
+  async archiveSpec(specName: string): Promise<void> {
+    this.logger.log(`SpecWorkflowService: Archiving spec '${specName}'`);
+
+    // Check for pending approvals first (Option A)
+    try {
+      const approvals = await this.getApprovals();
+      const pendingApprovals = approvals.filter(approval => 
+        approval.status === 'pending' && approval.categoryName === specName
+      );
+
+      if (pendingApprovals.length > 0) {
+        throw new Error(`Cannot archive spec '${specName}': ${pendingApprovals.length} pending approval(s) exist. Complete or reject approvals first.`);
+      }
+    } catch (error: any) {
+      if (error.message.includes('Cannot archive spec')) {
+        throw error;
+      }
+      // If there's an error getting approvals (e.g., no approvals directory), we can continue
+      this.logger.warn('Could not check approvals before archiving:', error.message);
+    }
+
+    // Archive the spec using the archive service
+    await this.archiveService.archiveSpec(specName);
+    this.logger.log(`SpecWorkflowService: Successfully archived spec '${specName}'`);
+
+    // Trigger UI updates
+    if (this.onSpecsChangedCallback) {
+      this.onSpecsChangedCallback();
+    }
+  }
+
+  /**
+   * Unarchive a specification
+   */
+  async unarchiveSpec(specName: string): Promise<void> {
+    this.logger.log(`SpecWorkflowService: Unarchiving spec '${specName}'`);
+
+    await this.archiveService.unarchiveSpec(specName);
+    this.logger.log(`SpecWorkflowService: Successfully unarchived spec '${specName}'`);
+
+    // Trigger UI updates
+    if (this.onSpecsChangedCallback) {
+      this.onSpecsChangedCallback();
+    }
+  }
+
+  /**
+   * Check if a spec is archived
+   */
+  async isSpecArchived(specName: string): Promise<boolean> {
+    return this.archiveService.isSpecArchived(specName);
+  }
+
+  /**
+   * Check if a spec is active (not archived)
+   */
+  async isSpecActive(specName: string): Promise<boolean> {
+    return this.archiveService.isSpecActive(specName);
+  }
+
+  /**
+   * Get the current location of a spec
+   */
+  async getSpecLocation(specName: string): Promise<'active' | 'archived' | 'not-found'> {
+    return this.archiveService.getSpecLocation(specName);
   }
 
 }

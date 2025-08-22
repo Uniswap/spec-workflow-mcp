@@ -9,6 +9,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private _currentSelectedSpec: string | null = null;
   private logger: Logger;
   private _previousApprovals: any[] = [];
+  private _messageQueue: Array<{ type: string; data: any }> = [];
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
@@ -123,11 +124,48 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case 'get-config':
           await this.sendConfig();
           break;
+        case 'get-archived-specs':
+          await this.sendArchivedSpecs();
+          break;
+        case 'archive-spec':
+          await this.archiveSpec(message.specName);
+          break;
+        case 'unarchive-spec':
+          await this.unarchiveSpec(message.specName);
+          break;
+        case 'open-external-url':
+          await this.openExternalUrl(message.url);
+          break;
       }
     });
 
     // Initialize data
     this.refreshAllData();
+    
+    // Process any queued messages now that view is ready
+    this.processMessageQueue();
+  }
+
+  private postMessageToWebview(message: { type: string; data: any }) {
+    if (this._view) {
+      console.log(`SidebarProvider: Sending message ${message.type} to webview`);
+      this._view.webview.postMessage(message);
+    } else {
+      console.log(`SidebarProvider: Queueing message ${message.type} - view not available`);
+      this._messageQueue.push(message);
+    }
+  }
+
+  private processMessageQueue() {
+    if (this._messageQueue.length > 0 && this._view) {
+      console.log(`SidebarProvider: Processing ${this._messageQueue.length} queued messages`);
+      const messages = [...this._messageQueue];
+      this._messageQueue = [];
+      messages.forEach(message => {
+        console.log(`SidebarProvider: Sending queued message ${message.type}`);
+        this._view!.webview.postMessage(message);
+      });
+    }
   }
 
   private async refreshAllData() {
@@ -240,7 +278,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private async handleApprovalChanges() {
     try {
+      console.log('=== handleApprovalChanges called ===');
       const currentApprovals = await this._specWorkflowService.getApprovals();
+      const pendingCount = currentApprovals.filter((a: any) => a.status === 'pending').length;
+      console.log(`handleApprovalChanges: Found ${currentApprovals.length} approvals (${pendingCount} pending)`);
+      console.log('handleApprovalChanges: View available:', !!this._view);
       
       // Check for new pending approvals
       const currentPendingIds = currentApprovals
@@ -293,24 +335,28 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       this._previousApprovals = [...currentApprovals];
       
       // Send approvals to webview as usual
-      this.sendApprovals();
+      console.log('handleApprovalChanges: Sending updated approvals to webview');
+      await this.sendApprovals();
       
     } catch (error) {
       console.error('Failed to handle approval changes:', error);
-      this.sendApprovals(); // Fallback to just sending approvals
+      console.log('handleApprovalChanges: Fallback - sending approvals despite error');
+      await this.sendApprovals(); // Fallback to just sending approvals
     }
   }
 
   private async sendApprovals() {
-    if (!this._view) {return;}
-
     try {
       const approvals = await this._specWorkflowService.getApprovals();
-      this._view.webview.postMessage({
+      const pendingCount = approvals.filter((a: any) => a.status === 'pending').length;
+      console.log(`sendApprovals: Loaded ${approvals.length} approvals (${pendingCount} pending), view available: ${!!this._view}`);
+      
+      this.postMessageToWebview({
         type: 'approvals-updated',
         data: approvals
       });
     } catch (error) {
+      console.error('sendApprovals: Error loading approvals:', error);
       this.sendError('Failed to load approvals: ' + (error as Error).message);
     }
   }
@@ -566,6 +612,106 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     } catch (error) {
       console.error('SidebarProvider: Failed to send sound URIs:', error);
       this.sendError('Failed to load sound URIs: ' + (error as Error).message);
+    }
+  }
+
+  // ========== ARCHIVE METHODS ==========
+
+  private async sendArchivedSpecs() {
+    try {
+      const archivedSpecs = await this._specWorkflowService.getAllArchivedSpecs();
+      console.log(`sendArchivedSpecs: Loaded ${archivedSpecs.length} archived specs, view available: ${!!this._view}`);
+      
+      this.postMessageToWebview({
+        type: 'archived-specs-updated',
+        data: archivedSpecs
+      });
+    } catch (error) {
+      console.error('sendArchivedSpecs: Error loading archived specs:', error);
+      this.sendError('Failed to load archived specs: ' + (error as Error).message);
+    }
+  }
+
+  private async archiveSpec(specName: string) {
+    try {
+      console.log(`SidebarProvider: Archiving spec '${specName}'`);
+      
+      // Show VSCode native confirmation dialog
+      const choice = await vscode.window.showWarningMessage(
+        `Are you sure you want to archive the specification "${specName}"?`,
+        {
+          detail: 'This will:\n• Remove it from all dropdowns and active views\n• Move all spec files to the archive\n• Block archiving if pending approvals exist\n\nYou can unarchive it later from the Documents tab.',
+          modal: true
+        },
+        'Archive',
+        'Cancel'
+      );
+
+      if (choice !== 'Archive') {
+        console.log(`SidebarProvider: User cancelled archiving spec '${specName}'`);
+        return;
+      }
+      
+      await this._specWorkflowService.archiveSpec(specName);
+      
+      // Refresh active specs list and archived specs list
+      await this.sendSpecs();
+      await this.sendArchivedSpecs();
+      
+      this.sendNotification(`Spec '${specName}' archived successfully`, 'success');
+      
+      // If the archived spec was selected, clear the selection
+      if (this._currentSelectedSpec === specName) {
+        this._currentSelectedSpec = null;
+        await this.sendSelectedSpec();
+      }
+    } catch (error) {
+      console.error(`SidebarProvider: Failed to archive spec '${specName}':`, error);
+      this.sendError('Failed to archive spec: ' + (error as Error).message);
+    }
+  }
+
+  private async unarchiveSpec(specName: string) {
+    try {
+      console.log(`SidebarProvider: Unarchiving spec '${specName}'`);
+      
+      // Show VSCode native confirmation dialog
+      const choice = await vscode.window.showWarningMessage(
+        `Are you sure you want to unarchive the specification "${specName}"?`,
+        {
+          detail: 'This will:\n• Move it back to active specifications\n• Make it available in all dropdowns and views\n• Restore all functionality',
+          modal: true
+        },
+        'Unarchive',
+        'Cancel'
+      );
+
+      if (choice !== 'Unarchive') {
+        console.log(`SidebarProvider: User cancelled unarchiving spec '${specName}'`);
+        return;
+      }
+      
+      await this._specWorkflowService.unarchiveSpec(specName);
+      
+      // Refresh active specs list and archived specs list
+      await this.sendSpecs();
+      await this.sendArchivedSpecs();
+      
+      this.sendNotification(`Spec '${specName}' unarchived successfully`, 'success');
+    } catch (error) {
+      console.error(`SidebarProvider: Failed to unarchive spec '${specName}':`, error);
+      this.sendError('Failed to unarchive spec: ' + (error as Error).message);
+    }
+  }
+
+  private async openExternalUrl(url: string) {
+    try {
+      console.log(`SidebarProvider: Opening external URL: ${url}`);
+      const uri = vscode.Uri.parse(url);
+      await vscode.env.openExternal(uri);
+    } catch (error) {
+      console.error(`SidebarProvider: Failed to open external URL '${url}':`, error);
+      this.sendError('Failed to open external URL: ' + (error as Error).message);
     }
   }
 
