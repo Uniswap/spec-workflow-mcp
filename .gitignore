@@ -137,12 +137,12 @@ dist
 
 # AI
 
-# Don't ignore .claude directory entirely - we want to track agents
-.claude
+# Ignore contents of .claude by default, but include specific subdirectories
+.claude/*
 !.claude/agents/
 !.claude/agents/**
-.serena
-
+!.claude/commands/
+!.claude/commands/**
 # Spec Workflow
 
 .spec-workflow/
