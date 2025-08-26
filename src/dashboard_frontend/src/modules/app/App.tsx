@@ -10,10 +10,7 @@ import { SteeringPage } from "../pages/SteeringPage";
 import { TasksPage } from "../pages/TasksPage";
 import { ApprovalsPage } from "../pages/ApprovalsPage";
 import { SpecViewerPage } from "../pages/SpecViewerPage";
-import {
-  NotificationProvider,
-  useNotifications,
-} from "../notifications/NotificationProvider";
+import { NotificationProvider } from "../notifications/NotificationProvider";
 import { VolumeControl } from "../notifications/VolumeControl";
 import { useApi } from "../api/api";
 function Header() {
