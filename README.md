@@ -104,8 +104,11 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
      }
    }
    ```
+<<<<<<< HEAD
 
    **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
+=======
+>>>>>>> upstream/main
    
    **With Auto-Started Dashboard** (opens dashboard automatically with MCP server):
    ```json
@@ -113,10 +116,14 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
+<<<<<<< HEAD
          "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
          "env": {
             "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
           }
+=======
+         "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+>>>>>>> upstream/main
        }
      }
    }
@@ -128,20 +135,30 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
+<<<<<<< HEAD
          "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"],
          "env": {
             "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
           }
+=======
+         "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"]
+>>>>>>> upstream/main
        }
      }
    }
    ```
+<<<<<<< HEAD
+=======
+   
+   **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
+>>>>>>> upstream/main
 
 2. **Choose your interface**:
    
    ### Option A: Web Dashboard (**REQUIRED for CLI users**)
    ```bash
    # Dashboard only mode (uses ephemeral port)
+<<<<<<< HEAD
    npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
    
    # Dashboard only with custom port
@@ -149,6 +166,15 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
    
    # View all available options
    npx -y @uniswap/spec-workflow-mcp@latest --help
+=======
+   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard
+   
+   # Dashboard only with custom port
+   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
+   
+   # View all available options
+   npx -y @pimzino/spec-workflow-mcp@latest --help
+>>>>>>> upstream/main
    ```
    
    **Command-Line Options:**
@@ -253,6 +279,18 @@ Or with auto-started dashboard:
     "spec-workflow": {
       "command": "npx",
       "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+    }
+  }
+}
+```
+
+Or with auto-started dashboard:
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
     }
   }
 }
@@ -378,7 +416,10 @@ The web dashboard is a separate service for CLI users. Each project gets its own
 - **Dark Mode** - Automatically enabled for better readability
 
 #### Dashboard Features
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/main
 - **Spec Cards** - Overview of each spec with status indicators
 - **Document Navigation** - Switch between requirements, design, and tasks
 - **Task Management** - View task progress and copy implementation prompts

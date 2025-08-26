@@ -247,7 +247,9 @@ export class DashboardServer {
     });
 
     this.app.get("/api/info", async () => {
-      const projectName = basename(this.options.projectPath) || "Project";
+      // Resolve the project path to get the actual directory name
+      const resolvedPath = resolve(this.options.projectPath);
+      const projectName = basename(resolvedPath) || "Project";
       const steeringStatus = await this.parser.getProjectSteeringStatus();
 
       // Use cached version fetched at startup
