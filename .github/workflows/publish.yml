@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0 # Fetch all history and tags for version analysis
-          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.WORKFLOW_PAT }}
 
       - name: Setup Node.js
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
@@ -68,10 +68,10 @@ jobs:
           # Store the old version
           OLD_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $OLD_VERSION"
-          
+
           # Determine what version bump to apply
           VERSION_CHANGED=false
-          
+
           # If manual version is provided
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION_INPUT="${{ github.event.inputs.version }}"
@@ -93,11 +93,11 @@ jobs:
           else
             echo "No version change specified, using current version from package.json"
           fi
-          
+
           # Get the new version
           NEW_VERSION=$(node -p "require('./package.json').version")
           echo "New version: $NEW_VERSION"
-          
+
           # Output for later steps
           echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -113,12 +113,12 @@ jobs:
         run: |
           # Add the changed files
           git add package.json package-lock.json
-          
+
           # Commit with standardized message to prevent infinite loop
           git commit -m "chore: bump version to ${{ steps.version_update.outputs.new_version }} [workflow:version-bump]" || echo "No changes to commit"
-          
+
           # Create a tag for the new version
           git tag -a "v${{ steps.version_update.outputs.new_version }}" -m "Release v${{ steps.version_update.outputs.new_version }}"
-          
+
           # Push changes and tags
           git push origin HEAD:main --follow-tags
