@@ -34,57 +34,66 @@ jobs:
 
       - name: Test dashboard production build
         run: |
-          # Verify the dashboard was built correctly
-          if [ ! -d "dist/dashboard" ]; then
-            echo "Dashboard build directory not found"
-            exit 1
-          fi
-          
-          # Check for essential dashboard files
-          if [ ! -f "dist/dashboard/index.html" ]; then
-            echo "Dashboard index.html not found"
-            exit 1
-          fi
-          
-          # Check that the index.html has the expected structure
-          if ! grep -q '<div id="root"></div>' dist/dashboard/index.html; then
-            echo "Dashboard index.html missing root div"
-            exit 1
-          fi
-          
-          # Check for built assets
-          if [ -z "$(ls -A dist/dashboard/assets 2>/dev/null)" ]; then
-            echo "Dashboard assets directory is empty or missing"
-            exit 1
-          fi
-          
-          # Use Python's built-in HTTP server to test serving the dashboard
-          cd dist/dashboard
-          python3 -m http.server 8080 &
+          # Start the dashboard server in the background on port 49743
+          echo "Starting dashboard server on port 49743..."
+          npm run dashboard:prod:run-only &
           SERVER_PID=$!
-          cd ../..
           
-          # Wait a moment for the server to start
-          sleep 2
-          
-          # Test that the dashboard is accessible
-          echo "Testing dashboard accessibility..."
-          RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
-          
-          if [ "$RESPONSE_CODE" = "200" ]; then
-            echo "Dashboard is serving correctly (HTTP 200)"
-            
-            # Verify content
-            RESPONSE=$(curl -s http://localhost:8080/)
-            if echo "$RESPONSE" | grep -q '<div id="root"></div>'; then
-              echo "Dashboard HTML structure verified"
-            else
-              echo "Dashboard HTML structure incorrect"
+          # Wait for server to start (max 60 seconds)
+          echo "Waiting for dashboard server to start..."
+          for i in {1..60}; do
+            # Check if the server is responding on port 49743
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:49743/ | grep -q "200"; then
+              echo "Dashboard server is running on port 49743"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "Dashboard server failed to start within 60 seconds"
               kill $SERVER_PID 2>/dev/null || true
               exit 1
             fi
+            sleep 1
+          done
+          
+          # Test that the dashboard is accessible and serving correct content
+          echo "Testing dashboard content..."
+          RESPONSE=$(curl -s http://localhost:49743/)
+          
+          # Check for the React root element
+          if echo "$RESPONSE" | grep -q '<div id="root"></div>'; then
+            echo "✓ Dashboard HTML structure verified (found root div)"
           else
-            echo "Dashboard failed to serve (HTTP $RESPONSE_CODE)"
+            echo "✗ Dashboard HTML structure incorrect (missing root div)"
+            echo "Response received:"
+            echo "$RESPONSE" | head -50
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
+          
+          # Check for essential meta tags and script tags
+          if echo "$RESPONSE" | grep -q '<meta charset="UTF-8"'; then
+            echo "✓ Found UTF-8 meta tag"
+          else
+            echo "✗ Missing UTF-8 meta tag"
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
+          
+          # Check that JavaScript assets are being loaded
+          if echo "$RESPONSE" | grep -q '<script'; then
+            echo "✓ Found script tags (JavaScript assets)"
+          else
+            echo "✗ No script tags found"
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
+          
+          # Final verification with status code
+          FINAL_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:49743/)
+          if [ "$FINAL_CODE" = "200" ]; then
+            echo "✓ Dashboard is serving correctly (HTTP 200)"
+          else
+            echo "✗ Dashboard returned HTTP $FINAL_CODE"
             kill $SERVER_PID 2>/dev/null || true
             exit 1
           fi

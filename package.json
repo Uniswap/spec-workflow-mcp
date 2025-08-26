@@ -19,6 +19,7 @@
     "start": "node dist/index.js",
     "dashboard:dev": "node scripts/dev-dashboard.mjs",
     "dashboard:prod": "npm run build; node dist/index.js . --AutoStartDashboard --port 49743",
+    "dashboard:prod:run-only": "node dist/index.js . --AutoStartDashboard --port 49743",
     "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run build",
