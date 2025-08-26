@@ -79,7 +79,6 @@ export class DashboardServer {
       root: publicDir,
       prefix: "/",
       // Additional security options
-      serve: false, // Don't serve directory listings
       decorateReply: true, // Add reply.sendFile method
     });
 
@@ -234,11 +233,9 @@ export class DashboardServer {
         }
 
         if (content == null) {
-          return reply
-            .code(500)
-            .send({
-              error: `Failed to read file at any known location for ${approval.filePath}`,
-            });
+          return reply.code(500).send({
+            error: `Failed to read file at any known location for ${approval.filePath}`,
+          });
         }
 
         return { content, filePath: resolvedPath || approval.filePath };
@@ -399,11 +396,9 @@ export class DashboardServer {
             message: "Archived document saved successfully",
           };
         } catch (error: any) {
-          reply
-            .code(500)
-            .send({
-              error: `Failed to save archived document: ${error.message}`,
-            });
+          reply.code(500).send({
+            error: `Failed to save archived document: ${error.message}`,
+          });
         }
       }
     );
@@ -544,11 +539,9 @@ export class DashboardServer {
           message: "Steering document saved successfully",
         };
       } catch (error: any) {
-        reply
-          .code(500)
-          .send({
-            error: `Failed to save steering document: ${error.message}`,
-          });
+        reply.code(500).send({
+          error: `Failed to save steering document: ${error.message}`,
+        });
       }
     });
 
@@ -610,12 +603,9 @@ export class DashboardServer {
           !status ||
           !["pending", "in-progress", "completed"].includes(status)
         ) {
-          return reply
-            .code(400)
-            .send({
-              error:
-                "Invalid status. Must be pending, in-progress, or completed",
-            });
+          return reply.code(400).send({
+            error: "Invalid status. Must be pending, in-progress, or completed",
+          });
         }
 
         try {
@@ -747,6 +737,19 @@ export class DashboardServer {
         }
       }
     );
+
+    // SPA fallback for client-side routing in production
+    // Use notFoundHandler to avoid clashing with fastify-static's own wildcard route
+    this.app.setNotFoundHandler(async (request, reply) => {
+      const url = request.raw.url || "";
+      // Let API and websocket paths 404 normally
+      if (url.startsWith("/api") || url.startsWith("/ws")) {
+        reply.code(404).send({ error: "Not Found" });
+        return;
+      }
+      // Serve the SPA entry for any other unknown path
+      return reply.type("text/html").sendFile("index.html");
+    });
 
     // Set up file watcher for specs
     this.watcher.on("change", (event) => {
