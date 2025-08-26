@@ -18,7 +18,7 @@
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "dev:dashboard": "node scripts/dev-dashboard.mjs",
-    "local:dashboard": "npm run build; node /Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp/dist/index.js /Users/nick.koutrelakos/Projects/forked/spec-workflow-mcp/ --AutoStartDashboard",
+    "local:dashboard": "npm run build; node dist/index.js . --AutoStartDashboard --port 49743",
     "build:dashboard": "vite build --config src/dashboard_frontend/vite.config.ts",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run build",
