@@ -19,9 +19,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Skip if commit is from workflow bot with version bump pattern
+    # Skip if commit is from workflow bot with version bump pattern or has [skip ci]
     if: |
-      !contains(github.event.head_commit.message, '[workflow:version-bump]')
+      !contains(github.event.head_commit.message, '[workflow:version-bump]') &&
+      !contains(github.event.head_commit.message, '[skip ci]')
     permissions:
       contents: write # Needed for version commits
       packages: write

@@ -1,6 +1,6 @@
 ---
 description: Sync upstream spec-workflow-mcp repository to local package's main branch
-allowed-tools: Bash(git:*), Bash(gh:*), mcp__github__create_pull_request
+allowed-tools: Bash(git:*), Bash(gh:*), mcp__github__*, mcp__graphite__*
 argument-hint: [optional: upstream-repo-url]
 ---
 
@@ -11,21 +11,30 @@ I'll help you sync the upstream spec-workflow-mcp repository with your local pac
 ## Process Overview
 
 I will:
+
 1. Ensure your local main branch is up to date
 2. Create a new sync branch with timestamp
-3. Fetch and merge upstream changes
+3. Fetch and merge upstream changes using GitHub MCP tools where possible
 4. Handle any conflicts by preserving features from both sources
 5. Create a PR to your main branch for review
 
-## Starting the sync process...
+## Starting the sync process
 
-First, let me check your current git status and remote configuration:
+First, let me check your current git status and configuration:
 
 !git status
-!git remote -v
 !git branch --show-current
 
-Now I'll set up the sync:
+Now I'll determine the repository owner and name:
+
+!REPO_URL=$(git remote get-url origin)
+!echo "Repository URL: $REPO_URL"
+
+### Parse owner and repo from URL (works for both SSH and HTTPS)
+
+!OWNER=$(echo "$REPO_URL" | sed -E 's/.*[:/]([^/]+)\/[^/]+\.git$/\1/')
+!REPO=$(echo "$REPO_URL" | sed -E 's/.*[:/][^/]+\/([^/]+)\.git$/\1/')
+!echo "Owner: $OWNER, Repo: $REPO"
 
 1. **Save current branch and stash changes if needed**
 !CURRENT_BRANCH=$(git branch --show-current) && echo "Current branch: $CURRENT_BRANCH"
@@ -37,7 +46,20 @@ Now I'll set up the sync:
 
 3. **Create a new sync branch**
 !SYNC_BRANCH="sync-upstream-$(date +%Y%m%d-%H%M%S)" && echo "Creating branch: $SYNC_BRANCH"
-!git checkout -b "$SYNC_BRANCH"
+
+Now I'll use the GitHub MCP to create the branch:
+
+```
+mcp__github__create_branch(
+  owner: "$OWNER",
+  repo: "$REPO",
+  branch: "$SYNC_BRANCH",
+  from_branch: "main"
+)
+```
+
+!git fetch origin
+!git checkout "$SYNC_BRANCH"
 
 4. **Configure upstream remote if not present**
 !UPSTREAM_URL="${ARGUMENTS:-https://github.com/Uniswap/spec-workflow-mcp.git}"
@@ -55,9 +77,11 @@ If there are conflicts, I'll help resolve them:
 ## Conflict Resolution Strategy
 
 When resolving conflicts, I will:
+
 - **Preserve local features**: Keep any custom functionality added to the local package
 - **Accept upstream improvements**: Incorporate bug fixes and enhancements from upstream
 - **Merge intelligently**: For overlapping changes, create a combined solution that includes both sets of features
+- **Remove additions mentioning pimzino**: Check CLOSELY for any code, comments, or documentation that references "pimzino". Migrate it to use the Uniswap equivalent, or otherwise just eliminate it to ensure the codebase is clean and free from such mentions. This fork is intended to be a Uniswao-specific solution.
 - **Document changes**: Add comments where significant merges occur
 
 Let me check if there are conflicts to resolve:
@@ -67,6 +91,7 @@ Let me check if there are conflicts to resolve:
 If conflicts exist, I'll analyze each conflicted file and resolve them:
 
 For each conflicted file, I will:
+
 1. Read both versions to understand the changes
 2. Create a merged version that preserves features from both
 3. Test that the merge maintains functionality
@@ -81,27 +106,47 @@ After resolving all conflicts (if any), I'll continue:
 8. **Run any available tests to ensure nothing is broken**
 !npm test 2>/dev/null || echo "No tests configured"
 
-9. **Create a pull request**
+9. **Push the branch and create a pull request**
 
-Now I'll create a PR to merge these changes into your main branch:
+First, push the branch:
+!git push -u origin "$SYNC_BRANCH"
 
-!gh pr create \
-  --title "Sync upstream spec-workflow-mcp repository" \
-  --body "This PR syncs the latest changes from the upstream spec-workflow-mcp repository while preserving local customizations.
+Now I'll create a PR using the GitHub MCP:
 
-## Changes included:
+```javascript
+mcp__github__create_pull_request(
+  owner: "$OWNER",
+  repo: "$REPO",
+  title: "Sync upstream spec-workflow-mcp repository",
+  body: "This PR syncs the latest changes from the upstream spec-workflow-mcp repository while preserving local customizations.
+
+## Changes included
+
 - Latest updates from upstream repository
 - Preserved all local custom features
 - Resolved conflicts (if any) by merging features from both sources
 
-## Merge strategy:
+## Merge strategy
+
 - Conflicts were resolved by combining features from both upstream and local
 - Local customizations were preserved
 - Upstream improvements were incorporated
 
-Please review the changes carefully before merging." \
-  --base main \
-  --head "$SYNC_BRANCH" || echo "Note: You may need to push the branch first with: git push -u origin $SYNC_BRANCH"
+Please review the changes carefully before merging.",
+  base: "main",
+  head: "$SYNC_BRANCH"
+)
+```
+
+If you're using Graphite, you can alternatively use:
+
+```javascript
+mcp__graphite__run_gt_cmd(
+  cwd: "$(pwd)",
+  args: ["submit", "--no-interactive"],
+  why: "Submit the sync branch as a PR"
+)
+```
 
 10. **Return to original branch**
 !git checkout "$CURRENT_BRANCH"
@@ -110,11 +155,13 @@ Please review the changes carefully before merging." \
 ## Summary
 
 The upstream sync process is complete! Here's what was done:
+
 - Created a new branch: `$SYNC_BRANCH`
 - Merged upstream changes while preserving local features
 - Created a PR for review before merging to main
 
 **Next steps:**
+
 1. Review the PR carefully
 2. Run your test suite to ensure everything works
 3. Merge the PR when ready
