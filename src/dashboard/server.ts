@@ -1,19 +1,18 @@
 import fastify, { FastifyInstance } from "fastify";
 import fastifyStatic from "@fastify/static";
 import fastifyWebsocket from "@fastify/websocket";
-import { join, dirname, basename, resolve } from 'path';
-import { readFile } from 'fs/promises';
-import { promises as fs } from 'fs';
-import { fileURLToPath } from 'url';
-import { SpecWatcher } from './watcher.js';
-import { SpecParser } from './parser.js';
-import open from 'open';
-import { WebSocket } from 'ws';
-import { findAvailablePort, validateAndCheckPort } from './utils.js';
-import { ApprovalStorage } from './approval-storage.js';
-import { parseTasksFromMarkdown } from '../core/task-parser.js';
-import { SpecArchiveService } from '../core/archive-service.js';
->>>>>>> upstream/main
+import { join, dirname, basename, resolve } from "path";
+import { readFile } from "fs/promises";
+import { promises as fs } from "fs";
+import { fileURLToPath } from "url";
+import { SpecWatcher } from "./watcher.js";
+import { SpecParser } from "./parser.js";
+import open from "open";
+import { WebSocket } from "ws";
+import { findAvailablePort, validateAndCheckPort } from "./utils.js";
+import { ApprovalStorage } from "./approval-storage.js";
+import { parseTasksFromMarkdown } from "../core/task-parser.js";
+import { SpecArchiveService } from "../core/archive-service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
