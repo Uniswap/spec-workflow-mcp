@@ -37,11 +37,11 @@ jobs:
           # Start the dashboard server in the background
           npm run dashboard:prod &
           SERVER_PID=$!
-          
+
           # Wait for server to start (max 30 seconds)
           echo "Waiting for dashboard server to start..."
           for i in {1..30}; do
-            if curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 | grep -q "200"; then
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:49743 | grep -q "200"; then
               echo "Dashboard server is running"
               break
             fi
@@ -52,9 +52,9 @@ jobs:
             fi
             sleep 1
           done
-          
+
           # Verify the app is serving correctly
-          RESPONSE=$(curl -s http://localhost:5173)
+          RESPONSE=$(curl -s http://localhost:49743)
           if echo "$RESPONSE" | grep -q "<div id=\"root\"></div>"; then
             echo "Dashboard app is serving correctly"
           else
@@ -62,7 +62,7 @@ jobs:
             kill $SERVER_PID 2>/dev/null || true
             exit 1
           fi
-          
+
           # Clean up
           kill $SERVER_PID 2>/dev/null || true
           echo "Dashboard production test completed successfully"
