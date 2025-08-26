@@ -1,18 +1,19 @@
 import fastify, { FastifyInstance } from "fastify";
 import fastifyStatic from "@fastify/static";
 import fastifyWebsocket from "@fastify/websocket";
-import { join, dirname, basename, resolve } from "path";
-import { readFile } from "fs/promises";
-import { promises as fs } from "fs";
-import { fileURLToPath } from "url";
-import { SpecWatcher } from "./watcher.js";
-import { SpecParser } from "./parser.js";
-import open from "open";
-import { WebSocket } from "ws";
-import { findAvailablePort, validateAndCheckPort } from "./utils.js";
-import { ApprovalStorage } from "./approval-storage.js";
-import { parseTasksFromMarkdown } from "../core/task-parser.js";
-import { SpecArchiveService } from "../core/archive-service.js";
+import { join, dirname, basename, resolve } from 'path';
+import { readFile } from 'fs/promises';
+import { promises as fs } from 'fs';
+import { fileURLToPath } from 'url';
+import { SpecWatcher } from './watcher.js';
+import { SpecParser } from './parser.js';
+import open from 'open';
+import { WebSocket } from 'ws';
+import { findAvailablePort, validateAndCheckPort } from './utils.js';
+import { ApprovalStorage } from './approval-storage.js';
+import { parseTasksFromMarkdown } from '../core/task-parser.js';
+import { SpecArchiveService } from '../core/archive-service.js';
+>>>>>>> upstream/main
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -247,7 +248,9 @@ export class DashboardServer {
     });
 
     this.app.get("/api/info", async () => {
-      const projectName = basename(this.options.projectPath) || "Project";
+      // Resolve the project path to get the actual directory name
+      const resolvedPath = resolve(this.options.projectPath);
+      const projectName = basename(resolvedPath) || "Project";
       const steeringStatus = await this.parser.getProjectSteeringStatus();
 
       // Use cached version fetched at startup
