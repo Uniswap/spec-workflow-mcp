@@ -429,6 +429,7 @@ function TaskList({ specName }: { specName: string }) {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setData(null); // Clear previous data when spec changes
     getSpecTasksProgress(specName)
       .then((d) => active && setData(d))
       .finally(() => active && setLoading(false));
