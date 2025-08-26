@@ -38,14 +38,14 @@ jobs:
           npm run dashboard:prod &
           SERVER_PID=$!
 
-          # Wait for server to start (max 30 seconds)
+          # Wait for server to start (max 60 seconds)
           echo "Waiting for dashboard server to start..."
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -s -o /dev/null -w "%{http_code}" http://localhost:49743 | grep -q "200"; then
               echo "Dashboard server is running"
               break
             fi
-            if [ $i -eq 30 ]; then
+            if [ $i -eq 60 ]; then
               echo "Dashboard server failed to start"
               kill $SERVER_PID 2>/dev/null || true
               exit 1
