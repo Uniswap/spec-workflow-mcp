@@ -70,6 +70,20 @@ For one-time use with npx, you can set the token as an environment variable:
 NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
 ```
 
+Alternatively, set the token in your shell environment:
+
+   ```bash
+   export NODE_AUTH_TOKEN=ghp_rest-of-your-token
+   ```
+
+   Then, use:
+
+   ```bash
+   # Add to your ~/.npmrc or project .npmrc
+   @uniswap:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+   ```
+
 ## Features
 
 - **Structured Development Workflow** - Sequential spec creation (Requirements → Design → Tasks)
@@ -97,108 +111,83 @@ NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to
        "spec-workflow": {
          "command": "npx",
          "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
-         "env": {
-            "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
-          }
        }
      }
    }
    ```
-<<<<<<< HEAD
 
    **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
-=======
->>>>>>> upstream/main
-   
+
    **With Auto-Started Dashboard** (opens dashboard automatically with MCP server):
+
    ```json
    {
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-<<<<<<< HEAD
          "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
-         "env": {
-            "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
-          }
-=======
-         "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
->>>>>>> upstream/main
        }
      }
    }
    ```
-   
+
    **With Custom Port**:
+
    ```json
    {
      "mcpServers": {
        "spec-workflow": {
          "command": "npx",
-<<<<<<< HEAD
          "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"],
-         "env": {
-            "NODE_AUTH_TOKEN": "$NODE_AUTH_TOKEN"
-          }
-=======
-         "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"]
->>>>>>> upstream/main
        }
      }
    }
    ```
-<<<<<<< HEAD
-=======
-   
+
    **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
->>>>>>> upstream/main
 
 2. **Choose your interface**:
-   
+
    ### Option A: Web Dashboard (**REQUIRED for CLI users**)
+
    ```bash
    # Dashboard only mode (uses ephemeral port)
-<<<<<<< HEAD
+
    npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
-   
-   # Dashboard only with custom port
-   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
-   
-   # View all available options
-   npx -y @uniswap/spec-workflow-mcp@latest --help
-=======
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard
-   
-   # Dashboard only with custom port
-   npx -y @pimzino/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
-   
-   # View all available options
-   npx -y @pimzino/spec-workflow-mcp@latest --help
->>>>>>> upstream/main
    ```
-   
+
+# Dashboard only with custom port
+
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
+
+# View all available options
+
+  npx -y @uniswap/spec-workflow-mcp@latest --help
+
    **Command-Line Options:**
-   - `--help` - Show comprehensive usage information and examples
-   - `--dashboard` - Run dashboard-only mode (no MCP server)
-   - `--AutoStartDashboard` - Auto-start dashboard with MCP server
-   - `--port <number>` - Specify dashboard port (1024-65535). Works with both `--dashboard` and `--AutoStartDashboard`
-   
-   ### Option B: VSCode Extension (**Recommended for VSCode users**)
-   
+
+- `--help` - Show comprehensive usage information and examples
+- `--dashboard` - Run dashboard-only mode (no MCP server)
+- `--AutoStartDashboard` - Auto-start dashboard with MCP server
+- `--port <number>` - Specify dashboard port (1024-65535). Works with both `--dashboard` and `--AutoStartDashboard`
+
+### Option B: VSCode Extension (**Recommended for VSCode users**)
+
    Install the **[Spec Workflow MCP Extension](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)** from the VSCode marketplace:
-   
+
    1. Open VSCode in your project directory containing `.spec-workflow/`
    2. The extension automatically provides the dashboard functionality within VSCode
    3. Access via the Spec Workflow icon in the Activity Bar
    4. **No separate dashboard needed** - everything runs within your IDE
-   
+
    **Extension Features:**
-   - Integrated sidebar dashboard with real-time updates
-   - Archive system for organizing completed specs
-   - Full approval workflow with VSCode native dialogs
-   - Sound notifications for approvals and completions
-   - Editor context menu actions for approvals and comments
-   
+
+- Integrated sidebar dashboard with real-time updates
+- Archive system for organizing completed specs
+- Full approval workflow with VSCode native dialogs
+- Sound notifications for approvals and completions
+- Editor context menu actions for approvals and comments
+
    **IMPORTANT:** For CLI users, the web dashboard is mandatory. For VSCode users, the extension replaces the need for a separate web dashboard while providing the same functionality directly in your IDE.
 
 ## How to Use
@@ -273,6 +262,7 @@ Add to `claude_desktop_config.json`:
 ```
 
 Or with auto-started dashboard:
+
 ```json
 {
   "mcpServers": {
@@ -285,6 +275,7 @@ Or with auto-started dashboard:
 ```
 
 Or with auto-started dashboard:
+
 ```json
 {
   "mcpServers": {
@@ -295,6 +286,7 @@ Or with auto-started dashboard:
   }
 }
 ```
+
 </details>
 
 <details>
@@ -416,10 +408,12 @@ The web dashboard is a separate service for CLI users. Each project gets its own
 - **Dark Mode** - Automatically enabled for better readability
 
 #### Dashboard Features
+
 <<<<<<< HEAD
 
 =======
 >>>>>>> upstream/main
+
 - **Spec Cards** - Overview of each spec with status indicators
 - **Document Navigation** - Switch between requirements, design, and tasks
 - **Task Management** - View task progress and copy implementation prompts
@@ -437,6 +431,7 @@ The VSCode extension provides all dashboard functionality directly within your I
 - **No External Dependencies** - Works entirely within VSCode
 
 #### Extension Advantages for VSCode Users
+
 - **Single Environment** - No need to switch between browser and IDE
 - **Native Experience** - Uses VSCode's native UI components
 - **Better Integration** - Context menu actions and editor integration

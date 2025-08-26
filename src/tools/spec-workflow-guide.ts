@@ -557,7 +557,9 @@ After the user approves the Design, create an actionable implementation plan wit
    - **Specific Files**: Must specify exact files to create/modify
    - **Agent-Friendly**: Clear input/output with minimal context switching
 
-   **Task Format Guidelines**:
+   **Task Format Guidelines (CRITICAL - MUST FOLLOW EXACTLY)**:
+   - **MANDATORY FORMAT**: Use ONLY list checkbox format: \`- [ ] TASK-ID: Description\`
+   - **DO NOT USE**: Heading format like \`#### [ ] TASK-ID\` (this will break the parser)
    - Format as numbered checkbox list with maximum two levels of hierarchy
    - Top-level items (like epics) should be used only when needed
    - Sub-tasks should be numbered with decimal notation (e.g., 1.1, 1.2, 2.1)
@@ -575,19 +577,26 @@ After the user approves the Design, create an actionable implementation plan wit
      - Marketing, documentation, or organizational activities
      - Any task that cannot be completed through writing/modifying/testing code
 
-   **Example Task Format**:
-   \`\`\`
+   **Example Task Format (CORRECT - Use This Format)**:
+   \`\`\`markdown
    - [ ] 1. Set up project structure and core interfaces
      - Create directory structure for models, services, repositories
      - Define interfaces that establish system boundaries
      - _Requirements: 1.1_
    
    - [ ] 2. Implement data models and validation
-   - [ ] 2.1 Create core data model interfaces and types
+   
+   - [ ] 2.1. Create core data model interfaces and types
      - Write TypeScript interfaces for all data models
      - Implement validation functions for data integrity
      - _Requirements: 2.1, 3.3_
      - _Leverage: src/types/base.ts_
+   
+   **INCORRECT FORMAT (DO NOT USE)**:
+   \`\`\`markdown
+   #### [ ] TASK-001: This format will break the parser
+   #### [ ] T001: This will not be recognized as a task
+   ### [ ] 1. This heading format is not supported
    \`\`\`
 
 4. **Create the document using the create-spec-doc TOOL**
