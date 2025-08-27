@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApi } from '../api/api';
 
 type NotificationContextType = {
-  showNotification: (message: string, type?: 'info' | 'success' | 'warning' | 'error') => void;
-  notifications: Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number }>;
+  showNotification: (message: string, type?: 'info' | 'success' | 'warning' | 'error', action?: () => void) => void;
+  notifications: Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number; action?: () => void }>;
   removeNotification: (id: string) => void;
   soundEnabled: boolean;
   toggleSound: () => void;
@@ -15,11 +16,12 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const { approvals, specs, getSpecTasksProgress } = useApi();
+  const navigate = useNavigate();
   const prevApprovalsRef = useRef<typeof approvals>([]);
   const prevTaskDataRef = useRef<Map<string, any>>(new Map());
   const isInitialLoadRef = useRef(true);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number }>>([]);
+  const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'info' | 'success' | 'warning' | 'error'; timestamp: number; action?: () => void }>>([]);
   const [soundEnabled, setSoundEnabled] = useState(() => {
     // Load sound preference from sessionStorage (since ports are ephemeral)
     const saved = sessionStorage.getItem('notification-sound-enabled');
@@ -92,9 +94,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
 
   // Show toast notification
-  const showNotification = useCallback((message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+  const showNotification = useCallback((message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info', action?: () => void) => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-    const notification = { id, message, type, timestamp: Date.now() };
+    const notification = { id, message, type, timestamp: Date.now(), action };
     
     setNotifications(prev => [...prev, notification]);
     
@@ -130,7 +132,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             : `${newlyCompleted} tasks completed in ${specDisplayName} (${currentTaskData.completed}/${currentTaskData.total})`;
           
           console.log('[NotificationProvider] Task completion detected:', message);
-          showNotification(message, 'success');
+          showNotification(message, 'success', () => navigate(`/tasks?spec=${encodeURIComponent(specName)}`));
           playNotificationSound();
         }
         
@@ -144,7 +146,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             
             const message = `Task started: ${taskTitle} in ${specDisplayName}`;
             console.log('[NotificationProvider] Task in-progress detected:', message);
-            showNotification(message, 'info');
+            showNotification(message, 'info', () => navigate(`/tasks?spec=${encodeURIComponent(specName)}`));
             playNotificationSound();
           }
         }
@@ -155,7 +157,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             currentTaskData.total > 0) {
           const message = `🎉 All tasks completed in ${specDisplayName}!`;
           console.log('[NotificationProvider] Project completion detected:', message);
-          showNotification(message, 'success');
+          showNotification(message, 'success', () => navigate(`/tasks?spec=${encodeURIComponent(specName)}`));
         }
       }
       
@@ -165,7 +167,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     } catch (error) {
       console.error('[NotificationProvider] Failed to handle task update:', error);
     }
-  }, [getSpecTasksProgress]);
+  }, [getSpecTasksProgress, showNotification, playNotificationSound, navigate]);
 
   // Detect new approvals
   useEffect(() => {
@@ -187,12 +189,12 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       // Show notifications for each new approval
       newApprovals.forEach(approval => {
         const message = `New approval request: ${approval.title}`;
-        showNotification(message, 'info');
+        showNotification(message, 'info', () => navigate('/approvals'));
       });
     }
 
     prevApprovalsRef.current = approvals;
-  }, [approvals, playNotificationSound, showNotification]);
+  }, [approvals, playNotificationSound, showNotification, navigate]);
 
   // Listen for WebSocket task updates and trigger detailed fetch
   useEffect(() => {
@@ -239,18 +241,26 @@ function NotificationToasts() {
       {notifications.map(notification => (
         <div
           key={notification.id}
+          onClick={() => {
+            if (notification.action) {
+              notification.action();
+              removeNotification(notification.id);
+            }
+          }}
           className={`rounded-lg p-4 shadow-lg border transition-all duration-300 ease-in-out ${
+            notification.action ? 'cursor-pointer hover:shadow-xl' : ''
+          } ${
             notification.type === 'error' 
-              ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200'
+              ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900 dark:border-red-800 dark:text-red-200'
               : notification.type === 'warning'
-              ? 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-200'  
+              ? 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:border-yellow-800 dark:text-yellow-200'  
               : notification.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200'
-              : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200'
+              ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900 dark:border-green-800 dark:text-green-200'
+              : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900 dark:border-blue-800 dark:text-blue-200'
           }`}
         >
           <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-2">
+            <div className="flex items-start space-x-2 flex-1">
               <svg 
                 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
                   notification.type === 'error' ? 'text-red-500' :
@@ -277,7 +287,10 @@ function NotificationToasts() {
               </p>
             </div>
             <button
-              onClick={() => removeNotification(notification.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                removeNotification(notification.id);
+              }}
               className="ml-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
