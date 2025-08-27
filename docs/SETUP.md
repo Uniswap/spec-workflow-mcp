@@ -232,7 +232,7 @@ Add to your `opencode.json` configuration file (either global at `~/.config/open
 1. Clone and build the repository:
 
    ```bash
-   git clone https://github.com/your-fork/spec-workflow-mcp
+   git clone https://github.com/your-org/spec-workflow-mcp
    cd spec-workflow-mcp
    npm install
    npm run build
@@ -241,7 +241,7 @@ Add to your `opencode.json` configuration file (either global at `~/.config/open
 2. Update your MCP configuration to point to the local build:
 
    ```json
-   "spec-workflow-forked": {
+   "spec-workflow": {
      "type": "stdio",
      "command": "node",
      "args": [

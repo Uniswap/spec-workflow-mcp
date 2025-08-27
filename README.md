@@ -116,7 +116,8 @@ Example configuration:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "type": "stdio",
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
     }
   }
 }
