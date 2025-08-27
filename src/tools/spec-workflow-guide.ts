@@ -599,12 +599,14 @@ After the user approves the Design, create an actionable implementation plan wit
    ### [ ] 1. This heading format is not supported
    \`\`\`
 
+   You can also reference the file in src/markdown/templates/tasks-template.md for an example of exactly how to format the tasks.md file created in the next step.
+
 4. **Create the document using the create-spec-doc TOOL**
    Call the create-spec-doc TOOL with:
    - projectPath: The project root path
    - specName: The same feature name used previously
    - document: "tasks"
-   - content: Your task list following the template
+   - content: Your task list following the template. Again, it's extremely important that you follow the format EXACTLY.
 
 5. **Request User Approval Using MCP Tools**
    - Use the request-approval TOOL to create an approval request:
