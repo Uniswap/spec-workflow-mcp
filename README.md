@@ -7,10 +7,6 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 > **Note:** This package is published to GitHub Packages. See [Installation](#installation) for setup instructions.
 
-<a href="https://glama.ai/mcp/servers/@Pimzino/spec-workflow-mcp">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@Pimzino/spec-workflow-mcp/badge" alt="Spec Workflow MCP server" />
-</a>
-
 ## 📺 Showcase
 
 ### 🔄 Approval System in Action
@@ -28,14 +24,6 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 </a>
 
 *Explore the real-time dashboard: view specs, track progress, navigate documents, and monitor your development workflow.*
-
----
-
-## ☕ Support This Project
-
-<a href="https://buymeacoffee.com/Pimzino" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
----
 
 ## Installation
 
@@ -281,7 +269,7 @@ Or with auto-started dashboard:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
     }
   }
 }
@@ -538,13 +526,3 @@ npm run clean
 ## License
 
 GPL-3.0
-
-## Star History
-
-<a href="https://www.star-history.com/#Pimzino/spec-workflow-mcp&Timeline">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Pimzino/spec-workflow-mcp&type=Timeline&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Pimzino/spec-workflow-mcp&type=Timeline" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Pimzino/spec-workflow-mcp&type=Timeline" />
- </picture>
-</a>

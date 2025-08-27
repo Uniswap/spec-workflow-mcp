@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { SpecWorkflowMCPServer } from './server.js';
-import { DashboardServer } from './dashboard/server.js';
-import { homedir } from 'os';
+import { SpecWorkflowMCPServer } from "./server.js";
+import { DashboardServer } from "./dashboard/server.js";
+import { homedir } from "os";
 
 function showHelp() {
   console.log(`
@@ -28,14 +28,14 @@ MODES OF OPERATION:
 1. MCP Server Only (default):
    spec-workflow-mcp
    spec-workflow-mcp ~/my-project
-   
+
    Starts MCP server without dashboard. Dashboard can be started separately.
 
 2. MCP Server with Auto-Started Dashboard:
    spec-workflow-mcp --AutoStartDashboard
    spec-workflow-mcp --AutoStartDashboard --port 3456
    spec-workflow-mcp ~/my-project --AutoStartDashboard
-   
+
    Starts MCP server and automatically launches dashboard in browser.
    Note: Server and dashboard shut down when MCP client disconnects.
 
@@ -43,7 +43,7 @@ MODES OF OPERATION:
    spec-workflow-mcp --dashboard
    spec-workflow-mcp --dashboard --port 3456
    spec-workflow-mcp ~/my-project --dashboard
-   
+
    Runs only the web dashboard without MCP server.
 
 EXAMPLES:
@@ -66,171 +66,196 @@ PORT FORMATS:
   --port 3456             Space-separated format
   --port=3456             Equals format
 
-For more information, visit: https://github.com/Pimzino/spec-workflow-mcp
+For more information, visit: https://github.com/Uniswap/spec-workflow-mcp
 `);
 }
 
 function expandTildePath(path: string): string {
-  if (path.startsWith('~/') || path === '~') {
-    return path.replace('~', homedir());
+  if (path.startsWith("~/") || path === "~") {
+    return path.replace("~", homedir());
   }
   return path;
 }
 
-function parseArguments(args: string[]): { 
-  projectPath: string; 
-  isDashboardMode: boolean; 
+function parseArguments(args: string[]): {
+  projectPath: string;
+  isDashboardMode: boolean;
   autoStartDashboard: boolean;
   port?: number;
 } {
-  const isDashboardMode = args.includes('--dashboard');
-  const autoStartDashboard = args.includes('--AutoStartDashboard');
+  const isDashboardMode = args.includes("--dashboard");
+  const autoStartDashboard = args.includes("--AutoStartDashboard");
   let customPort: number | undefined;
-  
+
   // Check for invalid flags
-  const validFlags = ['--dashboard', '--AutoStartDashboard', '--port', '--help', '-h'];
+  const validFlags = [
+    "--dashboard",
+    "--AutoStartDashboard",
+    "--port",
+    "--help",
+    "-h",
+  ];
   for (const arg of args) {
-    if (arg.startsWith('--') && !arg.includes('=')) {
+    if (arg.startsWith("--") && !arg.includes("=")) {
       if (!validFlags.includes(arg)) {
-        throw new Error(`Unknown option: ${arg}\nUse --help to see available options.`);
+        throw new Error(
+          `Unknown option: ${arg}\nUse --help to see available options.`
+        );
       }
-    } else if (arg.startsWith('--') && arg.includes('=')) {
-      const flagName = arg.split('=')[0];
+    } else if (arg.startsWith("--") && arg.includes("=")) {
+      const flagName = arg.split("=")[0];
       if (!validFlags.includes(flagName)) {
-        throw new Error(`Unknown option: ${flagName}\nUse --help to see available options.`);
+        throw new Error(
+          `Unknown option: ${flagName}\nUse --help to see available options.`
+        );
       }
     }
   }
-  
+
   // Parse --port parameter (supports --port 3000 and --port=3000 formats)
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
-    if (arg.startsWith('--port=')) {
+
+    if (arg.startsWith("--port=")) {
       // Handle --port=3000 format
-      const portStr = arg.split('=')[1];
+      const portStr = arg.split("=")[1];
       if (portStr) {
         const parsed = parseInt(portStr, 10);
         if (isNaN(parsed)) {
-          throw new Error(`Invalid port number: ${portStr}. Port must be a number.`);
+          throw new Error(
+            `Invalid port number: ${portStr}. Port must be a number.`
+          );
         }
         if (parsed < 1024 || parsed > 65535) {
-          throw new Error(`Port ${parsed} is out of range. Port must be between 1024 and 65535.`);
+          throw new Error(
+            `Port ${parsed} is out of range. Port must be between 1024 and 65535.`
+          );
         }
         customPort = parsed;
       } else {
-        throw new Error('--port parameter requires a value (e.g., --port=3000)');
+        throw new Error(
+          "--port parameter requires a value (e.g., --port=3000)"
+        );
       }
-    } else if (arg === '--port' && i + 1 < args.length) {
+    } else if (arg === "--port" && i + 1 < args.length) {
       // Handle --port 3000 format
       const portStr = args[i + 1];
       const parsed = parseInt(portStr, 10);
       if (isNaN(parsed)) {
-        throw new Error(`Invalid port number: ${portStr}. Port must be a number.`);
+        throw new Error(
+          `Invalid port number: ${portStr}. Port must be a number.`
+        );
       }
       if (parsed < 1024 || parsed > 65535) {
-        throw new Error(`Port ${parsed} is out of range. Port must be between 1024 and 65535.`);
+        throw new Error(
+          `Port ${parsed} is out of range. Port must be between 1024 and 65535.`
+        );
       }
       customPort = parsed;
       i++; // Skip the next argument as it's the port value
-    } else if (arg === '--port') {
-      throw new Error('--port parameter requires a value (e.g., --port 3000)');
+    } else if (arg === "--port") {
+      throw new Error("--port parameter requires a value (e.g., --port 3000)");
     }
   }
-  
+
   // Get project path (filter out flags and their values)
   const filteredArgs = args.filter((arg, index) => {
-    if (arg === '--dashboard') return false;
-    if (arg === '--AutoStartDashboard') return false;
-    if (arg.startsWith('--port=')) return false;
-    if (arg === '--port') return false;
+    if (arg === "--dashboard") return false;
+    if (arg === "--AutoStartDashboard") return false;
+    if (arg.startsWith("--port=")) return false;
+    if (arg === "--port") return false;
     // Check if this arg is a port value following --port
-    if (index > 0 && args[index - 1] === '--port') return false;
+    if (index > 0 && args[index - 1] === "--port") return false;
     return true;
   });
-  
+
   const rawProjectPath = filteredArgs[0] || process.cwd();
   const projectPath = expandTildePath(rawProjectPath);
-  
+
   return { projectPath, isDashboardMode, autoStartDashboard, port: customPort };
 }
 
 async function main() {
   try {
     const args = process.argv.slice(2);
-    
+
     // Check for help flag
-    if (args.includes('--help') || args.includes('-h')) {
+    if (args.includes("--help") || args.includes("-h")) {
       showHelp();
       process.exit(0);
     }
-    
-    const { projectPath, isDashboardMode, autoStartDashboard, port } = parseArguments(args);
-    
+
+    const { projectPath, isDashboardMode, autoStartDashboard, port } =
+      parseArguments(args);
+
     if (isDashboardMode) {
       // Dashboard only mode
-      console.log(`Starting Spec Workflow Dashboard for project: ${projectPath}`);
+      console.log(
+        `Starting Spec Workflow Dashboard for project: ${projectPath}`
+      );
       if (port) {
         console.log(`Using custom port: ${port}`);
       }
-      
+
       const dashboardServer = new DashboardServer({
         projectPath,
         autoOpen: true,
-        port
+        port,
       });
-      
+
       const dashboardUrl = await dashboardServer.start();
       console.log(`Dashboard started at: ${dashboardUrl}`);
-      console.log('Press Ctrl+C to stop the dashboard');
-      
+      console.log("Press Ctrl+C to stop the dashboard");
+
       // Handle graceful shutdown
       const shutdown = async () => {
-        console.log('\nShutting down dashboard...');
+        console.log("\nShutting down dashboard...");
         await dashboardServer.stop();
         process.exit(0);
       };
-      
-      process.on('SIGINT', shutdown);
-      process.on('SIGTERM', shutdown);
-      
+
+      process.on("SIGINT", shutdown);
+      process.on("SIGTERM", shutdown);
+
       // Keep the process running
       process.stdin.resume();
-      
     } else {
       // MCP server mode (with optional auto-start dashboard)
       const server = new SpecWorkflowMCPServer();
-      
+
       // Initialize with dashboard options
-      const dashboardOptions = autoStartDashboard ? {
-        autoStart: true,
-        port: port
-      } : undefined;
-      
+      const dashboardOptions = autoStartDashboard
+        ? {
+            autoStart: true,
+            port: port,
+          }
+        : undefined;
+
       await server.initialize(projectPath, dashboardOptions);
-      
+
       // Start monitoring for dashboard session
       server.startDashboardMonitoring();
-      
+
       // Inform user about MCP server lifecycle
       if (autoStartDashboard) {
-        console.log('\nMCP server is running. The server and dashboard will shut down when the MCP client disconnects.');
+        console.log(
+          "\nMCP server is running. The server and dashboard will shut down when the MCP client disconnects."
+        );
       }
-      
+
       // Handle graceful shutdown
-      process.on('SIGINT', async () => {
+      process.on("SIGINT", async () => {
         await server.stop();
         process.exit(0);
       });
-      
-      process.on('SIGTERM', async () => {
+
+      process.on("SIGTERM", async () => {
         await server.stop();
         process.exit(0);
       });
     }
-    
   } catch (error: any) {
-    console.error('Error:', error.message);
+    console.error("Error:", error.message);
     process.exit(1);
   }
 }

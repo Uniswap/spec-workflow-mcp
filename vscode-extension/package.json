@@ -3,12 +3,12 @@
   "displayName": "Spec Workflow MCP",
   "description": "VSCode extension for Spec-Workflow-MCP with integrated dashboard",
   "version": "0.0.2",
-  "publisher": "Pimzino",
+  "publisher": "Uniswap",
   "license": "GPL-3.0",
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Pimzino/spec-workflow-mcp.git"
+    "url": "https://github.com/Uniswap/spec-workflow-mcp.git"
   },
   "engines": {
     "vscode": "^1.99.0"
