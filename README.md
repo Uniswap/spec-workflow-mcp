@@ -27,44 +27,19 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 ## Installation
 
-### Setting up GitHub Packages Access
+### Quick Setup
 
-Since this package is published to Uniswap's GitHub Packages, you'll need to authenticate first:
+For detailed installation and setup instructions, see **[SETUP.md](SETUP.md)**.
 
-1. **Create a GitHub Personal Access Token (PAT)**:
-   - Go to GitHub Settings → Developer settings → Personal access tokens
-   - Create a token with `read:packages` scope
-   - Save the token securely
-
-2. **Configure npm to use GitHub Packages**:
-
-   ```bash
-   # Add to your ~/.npmrc or project .npmrc
-   @uniswap:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-   ```
-
-### Using with npx
-
-For one-time use with npx, you can set the token as an environment variable:
+**Prerequisites**: GitHub Packages authentication is required. See [SETUP.md](SETUP.md#prerequisites) for details.
 
 ```bash
-NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
+# Quick start with dashboard
+npx -y @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
+
+# Or add to your MCP client configuration
+# See SETUP.md for client-specific instructions
 ```
-
-Alternatively, set the token in your shell environment:
-
-   ```bash
-   export NODE_AUTH_TOKEN=ghp_rest-of-your-token
-   ```
-
-   Then, use:
-
-   ```bash
-   # Add to your ~/.npmrc or project .npmrc
-   @uniswap:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-   ```
 
 ## Features
 
@@ -83,94 +58,21 @@ Alternatively, set the token in your shell environment:
 
 ## Quick Start
 
-> **Prerequisites**: Ensure you have [configured GitHub Packages access](#setting-up-github-packages-access) before proceeding.
+For complete setup instructions, see **[SETUP.md](SETUP.md)**.
 
-1. **Add to your AI tool configuration** (see MCP Client Setup below):
+### Two Interface Options
 
-   ```json
-   {
-     "mcpServers": {
-       "spec-workflow": {
-         "command": "npx",
-         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
-       }
-     }
-   }
-   ```
-
-   **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
-
-   **With Auto-Started Dashboard** (opens dashboard automatically with MCP server):
-
-   ```json
-   {
-     "mcpServers": {
-       "spec-workflow": {
-         "command": "npx",
-         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
-       }
-     }
-   }
-   ```
-
-   **With Custom Port**:
-
-   ```json
-   {
-     "mcpServers": {
-       "spec-workflow": {
-         "command": "npx",
-         "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"],
-       }
-     }
-   }
-   ```
-
-   **Note:** Can be used without path to your project, but some MCP clients may not start the server from the current directory.
-
-2. **Choose your interface**:
-
-   ### Option A: Web Dashboard (**REQUIRED for CLI users**)
+1. **Web Dashboard** (Required for CLI users)
 
    ```bash
-   # Dashboard only mode (uses ephemeral port)
-
-   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard
+   npx -y @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
    ```
 
-# Dashboard only with custom port
+2. **VSCode Extension** (Recommended for VSCode users)
+   - Install from [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)
+   - No separate dashboard needed - integrated into VSCode
 
-   npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project --dashboard --port 3000
-
-# View all available options
-
-  npx -y @uniswap/spec-workflow-mcp@latest --help
-
-   **Command-Line Options:**
-
-- `--help` - Show comprehensive usage information and examples
-- `--dashboard` - Run dashboard-only mode (no MCP server)
-- `--AutoStartDashboard` - Auto-start dashboard with MCP server
-- `--port <number>` - Specify dashboard port (1024-65535). Works with both `--dashboard` and `--AutoStartDashboard`
-
-### Option B: VSCode Extension (**Recommended for VSCode users**)
-
-   Install the **[Spec Workflow MCP Extension](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)** from the VSCode marketplace:
-
-   1. Open VSCode in your project directory containing `.spec-workflow/`
-   2. The extension automatically provides the dashboard functionality within VSCode
-   3. Access via the Spec Workflow icon in the Activity Bar
-   4. **No separate dashboard needed** - everything runs within your IDE
-
-   **Extension Features:**
-
-- Integrated sidebar dashboard with real-time updates
-- Archive system for organizing completed specs
-- Full approval workflow with VSCode native dialogs
-- Sound notifications for approvals and completions
-- Editor context menu actions for approvals and comments
-
-   **IMPORTANT:** For CLI users, the web dashboard is mandatory. For VSCode users, the extension replaces the need for a separate web dashboard while providing the same functionality directly in your IDE.
+See [SETUP.md](SETUP.md#user-interface-options) for detailed interface options.
 
 ## How to Use
 
@@ -197,40 +99,17 @@ The agent automatically handles approval workflows, task management, and guides 
 
 ## MCP Client Setup
 
-<details>
-<summary><strong>Augment Code</strong></summary>
+See **[SETUP.md](SETUP.md#mcp-client-setup)** for detailed configuration instructions for:
 
-Configure in your Augment settings:
+- Augment Code
+- Claude Code CLI
+- Claude Desktop
+- Cline/Claude Dev
+- Continue IDE
+- Cursor IDE
+- OpenCode
 
-```json
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>Claude Code CLI</strong></summary>
-
-Add to your MCP configuration:
-
-```bash
-claude mcp add spec-workflow npx @uniswap/spec-workflow-mcp@latest /path/to/your/project
-```
-
-<strong> Note: </strong> You may need to wrap the command in cmd.exe /c "npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project" for Windows.
-</details>
-
-<details>
-<summary><strong>Claude Desktop</strong></summary>
-
-Add to `claude_desktop_config.json`:
+Example configuration:
 
 ```json
 {
@@ -242,110 +121,6 @@ Add to `claude_desktop_config.json`:
   }
 }
 ```
-
-Or with auto-started dashboard:
-
-```json
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
-    }
-  }
-}
-```
-
-Or with auto-started dashboard:
-
-```json
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>Cline/Claude Dev</strong></summary>
-
-Add to your MCP server configuration:
-
-```json
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>Continue IDE Extension</strong></summary>
-
-Add to your Continue configuration:
-
-```json
-{
-  "mcpServers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>Cursor IDE</strong></summary>
-
-Add to your Cursor settings (`settings.json`):
-
-```json
-{
-  "mcp.servers": {
-    "spec-workflow": {
-      "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary><strong>OpenCode</strong></summary>
-
-Add to your `opencode.json` configuration file (either global at `~/.config/opencode/opencode.json` or project-specific):
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
-    "spec-workflow": {
-      "type": "local",
-      "command": ["npx", "-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
-      "enabled": true
-    }
-  }
-}
-```
-
-</details>
-
-> **Note:** Replace `/path/to/your/project` with the actual path to your project directory where you want the spec workflow to operate.
 
 ## Available Tools
 
@@ -483,33 +258,13 @@ npm run clean
 
 ## Troubleshooting
 
-### Common Issues
+For comprehensive troubleshooting information, see **[SETUP.md](SETUP.md#troubleshooting)**.
 
-1. **Dashboard not starting**
-   - Ensure you're using the `--dashboard` flag when starting the dashboard service
-   - The dashboard must be started separately from the MCP server
-   - Check console output for the dashboard URL and any error messages
-   - If using `--port`, ensure the port number is valid (1024-65535) and not in use by another application
+### Quick Help
 
-2. **Approvals not working**
-   - Verify the dashboard is running alongside the MCP server
-   - The dashboard is required for document approvals and task tracking
-   - Check that both services are pointing to the same project directory
-
-3. **MCP server not connecting**
-   - Verify the file paths in your configuration are correct
-   - Ensure the project has been built with `npm run build`
-   - Check that Node.js is available in your system PATH
-
-4. **Port conflicts**
-   - If you get a "port already in use" error, try a different port with `--port <different-number>`
-   - Use `netstat -an | find ":3000"` (Windows) or `lsof -i :3000` (macOS/Linux) to check what's using a port
-   - Omit the `--port` parameter to automatically use an available ephemeral port
-
-5. **Dashboard not updating**
-   - The dashboard uses WebSockets for real-time updates
-   - Refresh the browser if connection is lost
-   - Check console for any JavaScript errors
+- **Dashboard issues**: Check [SETUP.md](SETUP.md#troubleshooting) for port and connection problems
+- **Authentication**: See [GitHub Packages setup](SETUP.md#prerequisites)
+- **MCP client issues**: Refer to [client-specific setup](SETUP.md#mcp-client-setup)
 
 ### Getting Help
 
