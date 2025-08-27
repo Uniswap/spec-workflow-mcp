@@ -164,10 +164,7 @@ When configuring MCP clients to use the GitHub Package:
     "spec-workflow": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/project"],
-      "env": {
-        "NODE_AUTH_TOKEN": "YOUR_GITHUB_TOKEN"
-      }
+      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/project", "--AutoStartDashboard"],
     }
   }
 }

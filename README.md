@@ -29,9 +29,9 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 ### Quick Setup
 
-For detailed installation and setup instructions, see **[SETUP.md](SETUP.md)**.
+For detailed installation and setup instructions, see **[SETUP.md](docs/SETUP.md)**.
 
-**Prerequisites**: GitHub Packages authentication is required. See [SETUP.md](SETUP.md#prerequisites) for details.
+**Prerequisites**: GitHub Packages authentication is required. See [SETUP.md](docs/SETUP.md#prerequisites) for details.
 
 ```bash
 # Quick start with dashboard
@@ -58,7 +58,7 @@ npx -y @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
 
 ## Quick Start
 
-For complete setup instructions, see **[SETUP.md](SETUP.md)**.
+For complete setup instructions, see **[SETUP.md](docs/SETUP.md)**.
 
 ### Two Interface Options
 
@@ -72,7 +72,7 @@ For complete setup instructions, see **[SETUP.md](SETUP.md)**.
    - Install from [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)
    - No separate dashboard needed - integrated into VSCode
 
-See [SETUP.md](SETUP.md#user-interface-options) for detailed interface options.
+See [SETUP.md](docs/SETUP.md#user-interface-options) for detailed interface options.
 
 ## How to Use
 
@@ -99,7 +99,7 @@ The agent automatically handles approval workflows, task management, and guides 
 
 ## MCP Client Setup
 
-See **[SETUP.md](SETUP.md#mcp-client-setup)** for detailed configuration instructions for:
+See **[SETUP.md](docs/SETUP.md#mcp-client-setup)** for detailed configuration instructions for:
 
 - Augment Code
 - Claude Code CLI
@@ -258,13 +258,13 @@ npm run clean
 
 ## Troubleshooting
 
-For comprehensive troubleshooting information, see **[SETUP.md](SETUP.md#troubleshooting)**.
+For comprehensive troubleshooting information, see **[SETUP.md](docs/SETUP.md#troubleshooting)**.
 
 ### Quick Help
 
-- **Dashboard issues**: Check [SETUP.md](SETUP.md#troubleshooting) for port and connection problems
-- **Authentication**: See [GitHub Packages setup](SETUP.md#prerequisites)
-- **MCP client issues**: Refer to [client-specific setup](SETUP.md#mcp-client-setup)
+- **Dashboard issues**: Check [SETUP.md](docs/SETUP.md#troubleshooting) for port and connection problems
+- **Authentication**: See [GitHub Packages setup](docs/SETUP.md#prerequisites)
+- **MCP client issues**: Refer to [client-specific setup](docs/SETUP.md#mcp-client-setup)
 
 ### Getting Help
 
