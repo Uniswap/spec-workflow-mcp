@@ -29,7 +29,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 ### Setting up GitHub Packages Access
 
-Since this package is published to GitHub Packages, you'll need to authenticate first:
+Since this package is published to Uniswap's GitHub Packages, you'll need to authenticate first:
 
 1. **Create a GitHub Personal Access Token (PAT)**:
    - Go to GitHub Settings → Developer settings → Personal access tokens
@@ -42,12 +42,6 @@ Since this package is published to GitHub Packages, you'll need to authenticate 
    # Add to your ~/.npmrc or project .npmrc
    @uniswap:registry=https://npm.pkg.github.com
    //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-   ```
-
-3. **Install the package**:
-
-   ```bash
-   npm install @uniswap/spec-workflow-mcp
    ```
 
 ### Using with npx
