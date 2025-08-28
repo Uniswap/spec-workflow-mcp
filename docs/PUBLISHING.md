@@ -136,7 +136,6 @@ For projects that need to use this package:
 
 ```bash
 # In your project root
-echo "@uniswap:registry=https://npm.pkg.github.com" > .npmrc
 echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
 ```
 
@@ -144,7 +143,6 @@ echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
 
 ```bash
 # In your home directory
-npm config set @uniswap:registry https://npm.pkg.github.com
 npm config set //npm.pkg.github.com/:_authToken NODE_AUTH_TOKEN
 ```
 

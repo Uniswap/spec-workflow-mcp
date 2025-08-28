@@ -17,7 +17,6 @@ Since this package is published to Uniswap's GitHub Packages, you'll need to aut
 
    ```bash
    # Add to your ~/.npmrc or project .npmrc
-   @uniswap:registry=https://npm.pkg.github.com
    //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
    ```
 
@@ -26,7 +25,7 @@ Since this package is published to Uniswap's GitHub Packages, you'll need to aut
 For one-time use with npx, you can set the token as an environment variable:
 
 ```bash
-NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
+NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx --@uniswap:registry=https://npm.pkg.github.com @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
 ```
 
 Alternatively, set the token in your shell environment:
@@ -39,7 +38,6 @@ Then, use:
 
 ```bash
 # Add to your ~/.npmrc or project .npmrc
-@uniswap:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
@@ -128,7 +126,7 @@ Configure in your Augment settings:
 Add to your MCP configuration:
 
 ```bash
-claude mcp add spec-workflow npx @uniswap/spec-workflow-mcp@latest /path/to/your/project
+claude mcp add spec-workflow --scope user -- npx -y --@uniswap:registry=https://npm.pkg.github.com @uniswap/spec-workflow-mcp@latest --AutoStartDashboard
 ```
 
 **Note:** You may need to wrap the command in `cmd.exe /c "npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project"` for Windows.
