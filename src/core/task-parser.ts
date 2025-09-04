@@ -172,12 +172,13 @@ export function parseTasksFromMarkdown(content: string): TaskParserResult {
     }
   }
   
-  // Calculate summary
+  // Calculate summary - exclude headers from total count
+  const nonHeaderTasks = tasks.filter(t => !t.isHeader);
   const summary = {
-    total: tasks.length,
-    completed: tasks.filter(t => t.status === 'completed').length,
-    inProgress: tasks.filter(t => t.status === 'in-progress').length,
-    pending: tasks.filter(t => t.status === 'pending').length,
+    total: nonHeaderTasks.length,  // Only count actual implementation tasks
+    completed: nonHeaderTasks.filter(t => t.status === 'completed').length,
+    inProgress: nonHeaderTasks.filter(t => t.status === 'in-progress').length,
+    pending: nonHeaderTasks.filter(t => t.status === 'pending').length,
     headers: tasks.filter(t => t.isHeader).length
   };
   
@@ -252,6 +253,7 @@ export function parseTaskProgress(content: string): {
   pending: number;
 } {
   const result = parseTasksFromMarkdown(content);
+  // Use the summary which already excludes headers from counts
   return {
     total: result.summary.total,
     completed: result.summary.completed,

@@ -210,7 +210,7 @@ ${context.userDescription}
   prompt += `
 
 ## Instructions
-1. Discover all available agents
+1. Discover all available agents in ~/.claude/agents/ and project-specific `.claude/agents/` directories
 2. Use agent-capability-analyst to analyze each agent
 3. Select the best agent(s) for this task
 4. Craft appropriate delegation prompts
@@ -283,8 +283,8 @@ You are the agent-orchestrator. Your role is to discover available agents, analy
 ${prompt}
 
 ## Your Tasks:
-1. Discover all available agents in the system
-2. Analyze each agent's capabilities using agent-capability-analyst
+1. Discover all available agents in the system in ~/.claude/agents/ and the project-specific .claude/agents/ directories
+2. Analyze each agent's capabilities using **agent-capability-analyst**
 3. Select the most appropriate agent(s) for this specific task
 4. Craft optimized delegation prompts for each selected agent
 5. Execute delegations (in parallel when beneficial)
