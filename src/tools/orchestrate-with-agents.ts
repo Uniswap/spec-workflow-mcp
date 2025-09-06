@@ -210,7 +210,7 @@ ${context.userDescription}
   prompt += `
 
 ## Instructions
-1. Discover all available agents in ~/.claude/agents/ and project-specific `.claude/agents/` directories
+1. Discover all available agents in ~/.claude/agents/ and project-specific .claude/agents/ directories
 2. Use agent-capability-analyst to analyze each agent
 3. Select the best agent(s) for this task
 4. Craft appropriate delegation prompts

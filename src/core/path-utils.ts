@@ -1,6 +1,7 @@
 import { join, normalize, sep, resolve } from 'path';
 import { access, stat, mkdir } from 'fs/promises';
 import { constants } from 'fs';
+import { gitignoreManager } from './gitignore-manager.js';
 
 export class PathUtils {
   static getWorkflowRoot(projectPath: string): string {
@@ -98,8 +99,42 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
   }
 }
 
+// Track which projects have had gitignore updated
+const gitignoreEnsured = new WeakMap<object, Set<string>>();
+const processKey = {}; // Unique key for this process
+
 export async function ensureWorkflowDirectory(projectPath: string): Promise<string> {
   const workflowRoot = PathUtils.getWorkflowRoot(projectPath);
+  
+  // Get or create the Set for this process
+  let ensuredPaths = gitignoreEnsured.get(processKey);
+  if (!ensuredPaths) {
+    ensuredPaths = new Set<string>();
+    gitignoreEnsured.set(processKey, ensuredPaths);
+  }
+  
+  // Ensure gitignore is updated (idempotent)
+  if (!ensuredPaths.has(projectPath)) {
+    ensuredPaths.add(projectPath);
+    
+    try {
+      const result = await gitignoreManager.ensure(projectPath, {
+        silent: false,
+        createIfMissing: true,
+        force: false
+      });
+      
+      // Log only if action was taken
+      if (result.action === 'created' || result.action === 'updated') {
+        console.log(`[INFO] ${result.message}`);
+      } else if (result.action === 'failed' && result.message) {
+        console.warn(`[WARN] ${result.message}`);
+      }
+    } catch (error) {
+      // Don't fail the whole operation if gitignore update fails
+      console.warn(`[WARN] Could not update .gitignore: ${(error as Error).message}`);
+    }
+  }
   
   // Create all necessary subdirectories (approvals created on-demand)
   const directories = [
