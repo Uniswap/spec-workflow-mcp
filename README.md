@@ -1,11 +1,10 @@
 # Spec Workflow MCP
 
-[![GitHub Package](https://img.shields.io/badge/GitHub%20Package-@uniswap%2Fspec--workflow--mcp-blue)](https://github.com/uniswap/spec-workflow-mcp/packages)
 [![VSCode Extension](https://badgen.net/vs-marketplace/v/Pimzino.spec-workflow-mcp)](https://marketplace.visualstudio.com/items?itemName=Pimzino.spec-workflow-mcp)
 
 A Model Context Protocol (MCP) server that provides structured spec-driven development workflow tools for AI-assisted software development, featuring a real-time web dashboard and VSCode extension for monitoring and managing your project's progress directly in your development environment.
 
-> **Note:** This package is published to GitHub Packages. See [Installation](#installation) for setup instructions.
+> **Note:** This package is published to a private NPM registry. See [Installation](#installation) for setup instructions.
 
 ## 📺 Showcase
 
@@ -15,7 +14,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
   <img src="https://img.youtube.com/vi/C-uEa3mfxd0/maxresdefault.jpg" alt="Approval System Demo" width="600">
 </a>
 
-*See how the approval system works: create documents, request approval through the dashboard, provide feedback, and track revisions.*
+_See how the approval system works: create documents, request approval through the dashboard, provide feedback, and track revisions._
 
 ### 📊 Dashboard & Spec Management
 
@@ -23,7 +22,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
   <img src="https://img.youtube.com/vi/g9qfvjLUWf8/maxresdefault.jpg" alt="Dashboard Demo" width="600">
 </a>
 
-*Explore the real-time dashboard: view specs, track progress, navigate documents, and monitor your development workflow.*
+_Explore the real-time dashboard: view specs, track progress, navigate documents, and monitor your development workflow._
 
 ## Installation
 
@@ -31,7 +30,7 @@ A Model Context Protocol (MCP) server that provides structured spec-driven devel
 
 For detailed installation and setup instructions, see **[SETUP.md](docs/SETUP.md)**.
 
-**Prerequisites**: GitHub Packages authentication is required. See [SETUP.md](docs/SETUP.md#prerequisites) for details.
+**Prerequisites**: Private NPM registry authentication is required. See [SETUP.md](docs/SETUP.md#prerequisites) for details.
 
 ```bash
 # Quick start with dashboard
@@ -117,7 +116,12 @@ Example configuration:
     "spec-workflow": {
       "command": "npx",
       "type": "stdio",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project",
+        "--AutoStartDashboard"
+      ]
     }
   }
 }
@@ -166,11 +170,6 @@ The web dashboard is a separate service for CLI users. Each project gets its own
 - **Dark Mode** - Automatically enabled for better readability
 
 #### Dashboard Features
-
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/main
 
 - **Spec Cards** - Overview of each spec with status indicators
 - **Document Navigation** - Switch between requirements, design, and tasks
@@ -264,7 +263,7 @@ For comprehensive troubleshooting information, see **[SETUP.md](docs/SETUP.md#tr
 ### Quick Help
 
 - **Dashboard issues**: Check [SETUP.md](docs/SETUP.md#troubleshooting) for port and connection problems
-- **Authentication**: See [GitHub Packages setup](docs/SETUP.md#prerequisites)
+- **Authentication**: See [Private NPM registry setup](docs/SETUP.md#prerequisites)
 - **MCP client issues**: Refer to [client-specific setup](docs/SETUP.md#mcp-client-setup)
 
 ### Getting Help

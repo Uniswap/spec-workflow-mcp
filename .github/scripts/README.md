@@ -53,7 +53,7 @@ The publish workflow now supports three trigger modes:
 - Uses Claude AI to analyze changes and determine version bump
 - Commits the version change back to the repository with `[skip ci]` flag
 - Creates a git tag for the new version (e.g., `v1.2.3`)
-- Publishes to GitHub Packages
+- Publishes to private NPM registry
 
 ### 2. Manual via Workflow Dispatch
 - Can be triggered manually from GitHub Actions UI
@@ -86,10 +86,11 @@ This approach ensures that:
 ### Required Secrets
 
 - `ANTHROPIC_API_KEY`: Your Claude API key for AI-powered version analysis
-- `GITHUB_TOKEN`: Automatically provided by GitHub Actions (has write permissions)
+- `NPM_TOKEN`: NPM authentication token for publishing to private registry
+- `WORKFLOW_PAT`: GitHub Personal Access Token for repository operations
 
 ### Workflow Permissions
 
 The workflow requires:
 - `contents: write` - To push commits and tags
-- `packages: write` - To publish to GitHub Packages
+- `id-token: write` - For authentication with private NPM registry
