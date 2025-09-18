@@ -4,42 +4,33 @@ This guide covers all setup options for spec-workflow-mcp, including installatio
 
 ## Prerequisites
 
-### Setting up GitHub Packages Access
+### NPM Registry Installation
 
-Since this package is published to Uniswap's GitHub Packages, you'll need to authenticate first:
+We publish the `spec-workflow-mcp` to a private npm package registry, so you’ll need to setup a read-only auth token to be able to fetch the package from npmjs.
 
-1. **Create a GitHub Personal Access Token (PAT)**:
-   - Go to GitHub Settings → Developer settings → Personal access tokens
-   - Create a token with `read:packages` scope
-   - Save the token securely
-
-2. **Configure npm to use GitHub Packages**:
-
-   ```bash
-   # Add to your ~/.npmrc or project .npmrc
-   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-   ```
-
-### Using with npx
-
-For one-time use with npx, you can set the token as an environment variable:
+1. The read only token is stored in 1password in the general Engineering vault under “[**read-only npm-token**](https://start.1password.com/open/i?a=DXU26BR6HNGVFCPLPXN7OGHSYM&v=a35mtzmo445emckvxmae47kbba&i=mseb2ygsl6gi3uxxhvmn5nfime&h=uniswaplabs.1password.com)”. If you have trouble finding it, please reach out to [\*\*#team-security](https://uniswapteam.enterprise.slack.com/archives/C015DE5T719).\*\*
+2. Create/Update your `~/.npmrc` with the necessary auth config by running the command below, substituting `${NODE_AUTH_TOKEN}` with the 1password npm token from step 1:
 
 ```bash
-NODE_AUTH_TOKEN=YOUR_GITHUB_TOKEN npx --@uniswap:registry=https://npm.pkg.github.com @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard
+if [ -f "$HOME/.npmrc" ]; then
+  echo "~/.npmrc file already exists, and we do not know its contents so we cannot predict how these lines will conflict with your existing .npmrc."
+  echo "Please manually add these private NPM configs to your ~/.npmrc file and make sure to replace \${NODE_AUTH_TOKEN} with your 1password npm token:"
+  echo ""
+  echo "@uniswap:registry=https://registry.npmjs.org"
+  echo "registry=https://registry.npmjs.org/"
+  echo "always-auth=true"
+  echo "//registry.npmjs.org/:_authToken=\${NODE_AUTH_TOKEN}"
+else
+  cat <<EOF >> ~/.npmrc
+@uniswap:registry=https://registry.npmjs.org
+registry=https://registry.npmjs.org/
+always-auth=true
+//registry.npmjs.org/:_authToken=\${NODE_AUTH_TOKEN}
+EOF
+fi
 ```
 
-Alternatively, set the token in your shell environment:
-
-```bash
-export NODE_AUTH_TOKEN=ghp_rest-of-your-token
-```
-
-Then, use:
-
-```bash
-# Add to your ~/.npmrc or project .npmrc
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-```
+3. Create a new terminal/shell and then run: `npx -y @uniswap/spec-workflow-mcp@latest /path/to/project --dashboard` where `/path/to/project` is a code repository you want to develop a new feature spec for, and it will open up a locally-hosted webpage with which you can view the development progress of your Claude Code tasks.
 
 ## Quick Start Options
 
@@ -72,7 +63,11 @@ Add to your AI tool configuration (for Claude Code, this is `$HOME/claude.json` 
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
 }
@@ -85,7 +80,12 @@ Add to your AI tool configuration (for Claude Code, this is `$HOME/claude.json` 
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"],
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project",
+        "--AutoStartDashboard"
+      ]
     }
   }
 }
@@ -98,7 +98,14 @@ Add to your AI tool configuration (for Claude Code, this is `$HOME/claude.json` 
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard", "--port", "3456"],
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project",
+        "--AutoStartDashboard",
+        "--port",
+        "3456"
+      ]
     }
   }
 }
@@ -115,7 +122,11 @@ Configure in your Augment settings:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
 }
@@ -126,7 +137,7 @@ Configure in your Augment settings:
 Add to your MCP configuration:
 
 ```bash
-claude mcp add spec-workflow --scope user -- npx -y --@uniswap:registry=https://npm.pkg.github.com @uniswap/spec-workflow-mcp@latest --AutoStartDashboard
+claude mcp add spec-workflow --scope user -- npx -y @uniswap/spec-workflow-mcp@latest --AutoStartDashboard
 ```
 
 **Note:** You may need to wrap the command in `cmd.exe /c "npx -y @uniswap/spec-workflow-mcp@latest /path/to/your/project"` for Windows.
@@ -140,7 +151,11 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
 }
@@ -153,7 +168,12 @@ Or with auto-started dashboard:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project", "--AutoStartDashboard"]
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project",
+        "--AutoStartDashboard"
+      ]
     }
   }
 }
@@ -168,7 +188,11 @@ Add to your MCP server configuration:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
 }
@@ -183,7 +207,11 @@ Add to your Continue configuration:
   "mcpServers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
 }
@@ -198,7 +226,11 @@ Add to your Cursor settings (`settings.json`):
   "mcp.servers": {
     "spec-workflow": {
       "command": "npx",
-      "args": ["-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"]
+      "args": [
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ]
     }
   }
 }
@@ -214,7 +246,12 @@ Add to your `opencode.json` configuration file (either global at `~/.config/open
   "mcp": {
     "spec-workflow": {
       "type": "local",
-      "command": ["npx", "-y", "@uniswap/spec-workflow-mcp@latest", "/path/to/your/project"],
+      "command": [
+        "npx",
+        "-y",
+        "@uniswap/spec-workflow-mcp@latest",
+        "/path/to/your/project"
+      ],
       "enabled": true
     }
   }
@@ -390,21 +427,25 @@ PROJECT_PATH=/path/to/project  # Project directory
 ### Common Issues
 
 1. **Dashboard not starting**
+
    - Ensure you're using the `--dashboard` flag
    - Check console output for the dashboard URL
    - Verify port availability (use `--port` for custom port)
 
-2. **GitHub Packages authentication failure**
-   - Verify your PAT has `read:packages` scope
+2. **Private NPM registry authentication failure**
+
+   - Verify your token is valid and has package access
    - Check `.npmrc` configuration
-   - Ensure `NODE_AUTH_TOKEN` is set correctly
+   - Ensure the NPM read-only auth token from 1password is set correctly
 
 3. **MCP server not connecting**
+
    - Verify file paths in your configuration
    - Ensure Node.js is available in your system PATH
    - Check that the project has been built (`npm run build`)
 
 4. **Port conflicts**
+
    - Use `--port <different-number>` to specify another port
    - Check what's using the port:
      - Windows: `netstat -an | find ":3000"`

@@ -45,7 +45,7 @@
     "url": "https://github.com/uniswap/spec-workflow-mcp.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
     "@fastify/static": "^7.0.4",
