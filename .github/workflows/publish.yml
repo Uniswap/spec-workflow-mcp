@@ -108,18 +108,6 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "version_changed=$VERSION_CHANGED" >> $GITHUB_OUTPUT
 
-      - name: Verify NPM authentication and organization
-        if: github.event_name == 'push'
-        run: |
-          echo "Verifying NPM authentication..."
-          npm whoami --registry=https://registry.npmjs.org
-
-          echo "Checking organization membership..."
-          # Check if we can access the @uniswap organization
-          npm org ls @uniswap --registry=https://registry.npmjs.org || echo "Note: Organization check may fail for new orgs"
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
-
       - name: Publish affected packages to NPM
         if: github.event_name == 'push'
         run: |
