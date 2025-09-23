@@ -111,7 +111,7 @@ jobs:
       - name: Publish affected packages to NPM
         if: github.event_name == 'push'
         run: |
-          echo "Publishing affected packages with tag: $NEW_VERSION to NPM"
+          echo "Publishing affected packages with tag: ${{ steps.version_update.outputs.new_version }} to NPM"
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
