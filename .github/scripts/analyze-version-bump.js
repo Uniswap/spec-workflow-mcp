@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { execSync } from 'child_process';
-import https from 'https';
 
 /**
  * Analyzes git changes using Claude API to determine appropriate semantic version bump
@@ -52,60 +51,43 @@ function getLatestTag() {
 }
 
 async function callClaudeAPI(apiKey, prompt) {
-  return new Promise((resolve, reject) => {
-    const data = JSON.stringify({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1000,
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.2 // Lower temperature for more consistent responses
-    });
+  const requestBody = {
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 1000,
+    messages: [
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    temperature: 0.2 // Lower temperature for more consistent responses
+  };
 
-    const options = {
-      hostname: 'api.anthropic.com',
-      port: 443,
-      path: '/v1/messages',
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': data.length,
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let responseData = '';
-
-      res.on('data', (chunk) => {
-        responseData += chunk;
-      });
-
-      res.on('end', () => {
-        try {
-          const response = JSON.parse(responseData);
-          if (response.error) {
-            reject(new Error(`Claude API error: ${response.error.message}`));
-          } else {
-            resolve(response);
-          }
-        } catch (error) {
-          reject(new Error(`Failed to parse Claude response: ${error.message}`));
-        }
-      });
+      },
+      body: JSON.stringify(requestBody)
     });
 
-    req.on('error', (error) => {
-      reject(new Error(`Request failed: ${error.message}`));
-    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    req.write(data);
-    req.end();
-  });
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(`Claude API error: ${data.error.message}`);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(`Request failed: ${error.message}`);
+  }
 }
 
 async function analyzeVersionBump(apiKey, changes) {
