@@ -36,7 +36,7 @@ MODES OF OPERATION:
    spec-workflow-mcp --AutoStartDashboard --port 3456
    spec-workflow-mcp ~/my-project --AutoStartDashboard
 
-   Starts MCP server and automatically launches dashboard in browser.
+   Starts MCP server and launches dashboard in browser on first spec-workflow-guide tool call.
    Note: Server and dashboard shut down when MCP client disconnects.
 
 3. Dashboard Only Mode:

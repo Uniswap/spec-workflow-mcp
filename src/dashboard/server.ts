@@ -816,10 +816,8 @@ export class DashboardServer {
     // Start server
     await this.app.listen({ port: this.actualPort, host: "0.0.0.0" });
 
-    // Open browser if requested
-    if (this.options.autoOpen) {
-      await open(`http://localhost:${this.actualPort}`);
-    }
+    // Note: Browser opening is now handled externally via openBrowser() method
+    // to allow lazy opening on first spec-workflow-guide tool call
 
     return `http://localhost:${this.actualPort}`;
   }
@@ -949,5 +947,21 @@ export class DashboardServer {
 
   getUrl(): string {
     return `http://localhost:${this.actualPort}`;
+  }
+
+  /**
+   * Opens the dashboard in the default browser.
+   * This is called separately from start() to allow lazy browser opening
+   * (e.g., on first spec-workflow-guide tool call instead of on server startup).
+   */
+  async openBrowser(): Promise<void> {
+    if (this.actualPort > 0) {
+      try {
+        await open(`http://localhost:${this.actualPort}`);
+      } catch (error: any) {
+        console.warn('Failed to open browser automatically:', error.message);
+        console.log(`Dashboard is running at: http://localhost:${this.actualPort}`);
+      }
+    }
   }
 }

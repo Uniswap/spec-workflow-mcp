@@ -26,6 +26,7 @@ export class SpecWorkflowMCPServer {
   private dashboardUrl?: string;
   private sessionManager?: SessionManager;
   private dashboardMonitoringInterval?: NodeJS.Timeout;
+  private browserOpened: boolean = false;
 
   constructor() {
     this.server = new Server({
@@ -84,9 +85,6 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
         });
         this.dashboardUrl = await this.dashboardServer.start();
         
-        // Create session tracking (overwrites any existing session.json)
-        await this.sessionManager.createSession(this.dashboardUrl);
-        
         // Log dashboard startup info
         console.log(`Dashboard auto-started at: ${this.dashboardUrl}`);
       }
@@ -140,6 +138,24 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
+        // Open browser on first spec-workflow-guide call if auto-start is enabled
+        if (request.params.name === 'spec-workflow-guide' &&
+            !this.browserOpened &&
+            this.dashboardServer &&
+            this.dashboardUrl) {
+          this.browserOpened = true; // Set flag before awaiting to prevent race conditions
+
+          // Create session tracking (overwrites any existing session.json)
+          await this.sessionManager!.createSession(this.dashboardUrl);
+
+          try {
+            await this.dashboardServer.openBrowser();
+            console.log('Dashboard opened in browser (first spec-workflow-guide call)');
+          } catch (error) {
+            console.error('Failed to open browser:', error);
+          }
+        }
+
         // Create dynamic context with current dashboard URL
         const dynamicContext = {
           ...context,
