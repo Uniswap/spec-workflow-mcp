@@ -26,6 +26,7 @@ export class SpecWorkflowMCPServer {
   private dashboardUrl?: string;
   private sessionManager?: SessionManager;
   private dashboardMonitoringInterval?: NodeJS.Timeout;
+  private browserOpened: boolean = false;
 
   constructor() {
     this.server = new Server({
@@ -140,6 +141,16 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
+        // Open browser on first spec-workflow-guide call if auto-start is enabled
+        if (request.params.name === 'spec-workflow-guide' &&
+            !this.browserOpened &&
+            this.dashboardServer &&
+            this.dashboardUrl) {
+          this.browserOpened = true; // Set flag before awaiting to prevent race conditions
+          await this.dashboardServer.openBrowser();
+          console.log('Dashboard opened in browser (first spec-workflow-guide call)');
+        }
+
         // Create dynamic context with current dashboard URL
         const dynamicContext = {
           ...context,
