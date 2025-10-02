@@ -148,8 +148,12 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
           // Create session tracking (overwrites any existing session.json)
           await this.sessionManager!.createSession(this.dashboardUrl);
 
-          await this.dashboardServer.openBrowser();
-          console.log('Dashboard opened in browser (first spec-workflow-guide call)');
+          try {
+            await this.dashboardServer.openBrowser();
+            console.log('Dashboard opened in browser (first spec-workflow-guide call)');
+          } catch (error) {
+            console.error('Failed to open browser:', error);
+          }
         }
 
         // Create dynamic context with current dashboard URL
