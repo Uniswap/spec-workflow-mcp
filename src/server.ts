@@ -85,9 +85,6 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
         });
         this.dashboardUrl = await this.dashboardServer.start();
         
-        // Create session tracking (overwrites any existing session.json)
-        await this.sessionManager.createSession(this.dashboardUrl);
-        
         // Log dashboard startup info
         console.log(`Dashboard auto-started at: ${this.dashboardUrl}`);
       }
@@ -147,6 +144,10 @@ Remember: The spec-workflow-guide tool contains all the detailed instructions yo
             this.dashboardServer &&
             this.dashboardUrl) {
           this.browserOpened = true; // Set flag before awaiting to prevent race conditions
+
+          // Create session tracking (overwrites any existing session.json)
+          await this.sessionManager!.createSession(this.dashboardUrl);
+
           await this.dashboardServer.openBrowser();
           console.log('Dashboard opened in browser (first spec-workflow-guide call)');
         }
